@@ -1,0 +1,28 @@
+HOOKS
+=====
+
+This directory contains post-receive hooks that allow you to set up a
+hair-shirted remote-build framework. Using this, you can trigger builds as
+follows:
+
+	$ git push straylight:crs-yocto-autobuild HEAD:rootfs
+
+Setting Up
+----------
+
+1. On the build server, set up a bare repository endpoint that will receive
+   your push triggers:
+
+   $ git clone --bare git@github.com:t0/crs-yocto.git crs-yocto-autobuild
+
+2. On the build server, install the post-receive hook:
+
+   $ cd crs-yocto-autobuild
+   $ git show main:hooks/post-receive > hooks/post-receive
+   $ chmod 755 hooks/post-receive
+
+3. On your development machine, try it out:
+
+   $ git push straylight:crs-yocto-autobuild HEAD:rootfs
+
+   This invokes the "rootfs" target on "straylight".

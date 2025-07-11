@@ -1,0 +1,104 @@
+[submodule "poky"]
+	path = poky
+	url = https://github.com/Xilinx/poky
+	branch = rel-v2024.2
+
+[submodule "meta-xilinx"]
+	path = meta-xilinx
+	url = https://github.com/Xilinx/meta-xilinx.git
+	branch = rel-v2024.2
+
+[submodule "meta-xilinx-tools"]
+	path = meta-xilinx-tools
+	url = https://github.com/Xilinx/meta-xilinx-tools
+	branch = rel-v2024.2
+
+[submodule "meta-arm"]
+	path = meta-arm
+	url = https://github.com/Xilinx/meta-arm
+	branch = rel-v2024.2
+
+[submodule "meta-petalinux"]
+	path = meta-petalinux
+	url = https://github.com/Xilinx/meta-petalinux
+	branch = rel-v2024.2
+
+[submodule "meta-embedded-plus"]
+	path = meta-embedded-plus
+	url = https://github.com/Xilinx/meta-embedded-plus
+	branch = rel-v2024.2
+
+[submodule "meta-virtualization"]
+	path = meta-virtualization
+	url = https://github.com/Xilinx/meta-virtualization
+	branch = rel-v2024.2
+
+[submodule "meta-security"]
+	path = meta-security
+	url = https://github.com/Xilinx/meta-security
+	branch = rel-v2024.2
+
+[submodule "meta-openembedded"]
+	path = meta-openembedded
+	url = https://github.com/Xilinx/meta-openembedded
+	branch = rel-v2024.2
+
+[submodule "meta-openamp"]
+	path = meta-openamp
+	url = https://github.com/Xilinx/meta-openamp
+	branch = rel-v2024.2
+
+[submodule "meta-rauc"]
+	path = meta-rauc
+	url = https://github.com/Xilinx/meta-rauc
+	branch = rel-v2024.2
+
+[submodule "meta-jupyter"]
+	path = meta-jupyter
+	url = https://github.com/Xilinx/meta-jupyter
+	branch = rel-v2024.2
+
+[submodule "meta-system-controller"]
+	path = meta-system-controller
+	url = https://github.com/Xilinx/meta-system-controller
+	branch = rel-v2024.2
+
+[submodule "meta-vitis"]
+	path = meta-vitis
+	url = https://github.com/Xilinx/meta-vitis
+	branch = rel-v2024.2
+
+[submodule "meta-amd-adaptive-socs"]
+	path = meta-amd-adaptive-socs
+	url = https://github.com/Xilinx/meta-amd-adaptive-socs
+	branch = rel-v2024.2
+
+[submodule "meta-xilinx-tsn"]
+	path = meta-xilinx-tsn
+	url = https://github.com/Xilinx/meta-xilinx-tsn
+	branch = rel-v2024.2
+
+#[submodule "meta-kria"]
+#	path = meta-kria
+#	url = https://github.com/Xilinx/meta-kria
+#	branch = rel-v2024.2
+
+[submodule "meta-mingw"]
+	path = meta-mingw
+	url = https://github.com/Xilinx/meta-mingw
+	branch = rel-v2024.2
+
+[submodule "meta-qt5"]
+	path = meta-qt5
+	url = https://github.com/Xilinx/meta-qt5
+	branch = rel-v2024.2
+
+#[submodule "meta-aws"]
+#	path = meta-aws
+#	url = https://github.com/Xilinx/meta-aws
+#	branch = rel-v2024.2
+
+#[submodule "meta-ros"]
+#	path = meta-ros
+#	url = https://github.com/Xilinx/meta-ros
+#	branch = rel-v2024.2
