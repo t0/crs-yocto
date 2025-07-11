@@ -12,6 +12,7 @@ then
 	exit
 fi
 
+unset GIT_DIR  # figure it out yourself
 cd "$WORKTREE"
 echo "Autobuild: working directory is $(pwd)"
 
