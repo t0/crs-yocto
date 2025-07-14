@@ -18,10 +18,10 @@
 	url = https://github.com/Xilinx/meta-arm
 	branch = rel-v2024.2
 
-[submodule "meta-petalinux"]
-	path = meta-petalinux
-	url = https://github.com/Xilinx/meta-petalinux
-	branch = rel-v2024.2
+#[submodule "meta-petalinux"]
+#	path = meta-petalinux
+#	url = https://github.com/Xilinx/meta-petalinux
+#	branch = rel-v2024.2
 
 [submodule "meta-embedded-plus"]
 	path = meta-embedded-plus

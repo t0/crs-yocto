@@ -90,7 +90,7 @@ DL_DIR ?= "/var/tmp/yocto_downloads"
 # Ultimately when creating custom policy, people will likely end up subclassing 
 # these defaults.
 #
-DISTRO ?= "petalinux"
+DISTRO ?= "poky"
 
 #
 # Package Management configuration
