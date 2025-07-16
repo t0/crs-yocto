@@ -8,7 +8,7 @@ SDTFILE := sdt/system-top.dts
 
 # Step 1: XSA -> sdt
 $(SDTFILE): $(XSA)
-	bin/sdtgen $<
+	source /opt/xilinx/2025.1/Vivado/settings64.sh && bin/sdtgen $<
 
 Step 2: sdt -> machine configuration
 $(MACHINEFILE): init $(SDTFILE)
