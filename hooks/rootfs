@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# Check prerequisites
+if ! command -v git-lfs &> /dev/null
+then
+	echo "ERROR: git-lfs is not installed. It's an essential prerequisite."
+	exit
+fi
+
 oldrev="$1"
 newrev="$2"
 refname="$3"
