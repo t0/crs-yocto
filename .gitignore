@@ -1,2 +1,6 @@
 build/
 bitbake-cookerdaemon.log
+.Xil/
+output/
+sdt/
+*.swp

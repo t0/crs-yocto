@@ -1,0 +1,15 @@
+#!/usr/bin/env -S sdtgen
+
+# XSA import - per https://github.com/Xilinx/system-device-tree-xlnx/blob/master/README.md
+#
+# Usage:
+#
+#     crs-yocto$ bin/sdtgen /path/to/t0-crs.xsa
+#
+# This updates the files in the sdt/ directory.
+
+set outdir sdt
+set xsa [lindex $argv 0]
+
+sdtgen set_dt_param -xsa $xsa -dir $outdir
+sdtgen generate_sdt
