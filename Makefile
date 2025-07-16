@@ -1,17 +1,23 @@
 default: rootfs
-
-.PHONY: init default clean rootfs
+.PHONY: default clean rootfs
 
 XSA ?= t0-crs.xsa
 MACHINEFILE := build/conf/machine/t0-crs.conf
 SDTFILE := sdt/system-top.dts
+INITIALIZED = .initialized
+
+# Step 0: prepare the build filesystem
+$(INITIALIZED):
+	git submodule update --init --recursive
+	TEMPLATECONF="$(PWD)/meta-t0-crs/conf/templates/t0-crs" source poky/oe-init-build-env
+	touch $(INITIALIZED)
 
 # Step 1: XSA -> sdt
-$(SDTFILE): $(XSA)
+$(SDTFILE): $(XSA) $(INITIALIZED)
 	source /opt/xilinx/2025.1/Vivado/settings64.sh && bin/sdtgen $<
 
-Step 2: sdt -> machine configuration
-$(MACHINEFILE): init $(SDTFILE)
+# Step 2: sdt -> machine configuration
+$(MACHINEFILE): $(SDTFILE)
 	# Generate the machine definition from the materials in 'sdt', which
 	# themselves can be updated from a Vivado-generated .xsa file using
 	# bin/sdtgen. There's an annoying chicken-and-egg: gen-machine-conf
@@ -22,12 +28,9 @@ $(MACHINEFILE): init $(SDTFILE)
 		../meta-xilinx/meta-xilinx-core/gen-machine-conf/gen-machine-conf \
 		parse-sdt --hw-description ../sdt --machine-name=t0-crs
 
-init:
-	git submodule update --init --recursive
-	TEMPLATECONF="$(PWD)/meta-t0-crs/conf/templates/t0-crs" source poky/oe-init-build-env
-
-rootfs: init $(MACHINEFILE)
+# Step 3: build image
+rootfs: $(MACHINEFILE)
 	source poky/oe-init-build-env && bitbake t0-crs-image
 
 clean:
-	rm -rf build output
+	rm -rf build output sdt
