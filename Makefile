@@ -24,6 +24,7 @@ $(MACHINEFILE): init $(SDTFILE)
 
 init:
 	git submodule update --init --recursive
+	TEMPLATECONF="$(PWD)/meta-t0-crs/conf/templates/t0-crs" source poky/oe-init-build-env
 
 rootfs: init $(MACHINEFILE)
 	source poky/oe-init-build-env && bitbake t0-crs-image
