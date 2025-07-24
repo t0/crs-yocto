@@ -16,3 +16,9 @@ SRC_URI:append = " \
 inherit pypi python_maturin
 
 PTEST_PYTEST_DIR = "test"
+
+# orjson segfaults if these are not present
+RDEPENDS:${PN} += " \
+    python3-zoneinfo \
+    python3-json \
+"
