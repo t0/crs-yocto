@@ -4,3 +4,4 @@ bitbake-cookerdaemon.log
 output/
 sdt/
 *.swp
+.initialized
