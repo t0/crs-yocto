@@ -8,6 +8,7 @@ INITIALIZED = .initialized
 
 # Step 0: prepare the build filesystem
 $(INITIALIZED):
+	git submodule sync --recursive
 	git submodule update --init --recursive
 	TEMPLATECONF="$(PWD)/meta-t0-crs/conf/templates/t0-crs" source poky/oe-init-build-env
 	touch $(INITIALIZED)
