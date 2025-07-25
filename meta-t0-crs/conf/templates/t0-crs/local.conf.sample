@@ -81,9 +81,10 @@ DISTRO ?= "poky"
 #  - 'package_deb' for debian style deb files
 #  - 'package_ipk' for ipk files are used by opkg (a debian style embedded package manager)
 #  - 'package_rpm' for rpm style packages
-# E.g.: PACKAGE_CLASSES ?= "package_rpm package_deb package_ipk"
 
-PACKAGE_CLASSES ?= "package_deb"
+# poky defaults to rpm, oe-core defaults to ipk, and deb appears to lag a little
+# (see e.g. https://bugzilla.yoctoproject.org/show_bug.cgi?id=14066)
+PACKAGE_CLASSES ?= "package_ipk"
 
 #
 # SDK target architecture
