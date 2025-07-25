@@ -15,6 +15,8 @@ IMAGE_INSTALL += " \
         coreutils \
         packagegroup-xilinx-jupyter \
         python3-tuberd \
+        python3-numpy \
+        python3-matplotlib \
         valgrind \
         "
 
