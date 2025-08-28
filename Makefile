@@ -2,6 +2,8 @@ default: rootfs
 .PHONY: default clean rootfs
 
 XSA ?= t0-crs.xsa
+DTSI ?= dts/t0-crs.dtsi
+
 MACHINEFILE := build/conf/machine/t0-crs.conf
 SDTFILE := sdt/system-top.dts
 INITIALIZED = .initialized
@@ -14,8 +16,8 @@ $(INITIALIZED):
 	touch $(INITIALIZED)
 
 # Step 1: XSA -> sdt
-$(SDTFILE): $(XSA) $(INITIALIZED)
-	source /opt/xilinx/2025.1/Vivado/settings64.sh && bin/sdtgen $<
+$(SDTFILE): $(INITIALIZED) $(XSA) $(DTSI) bin/sdtgen
+	source /opt/xilinx/2025.1/Vivado/settings64.sh && bin/sdtgen $(XSA) $(DTSI)
 
 # Step 2: sdt -> machine configuration
 $(MACHINEFILE): $(SDTFILE)
