@@ -1,0 +1,5 @@
+dhcp
+fatload mmc 0 $kernel_addr_r Image
+fatload mmc 0 $fdt_addr_r system.dtb
+setenv bootargs "earlycon console=ttyPS0,115200 ip=dhcp ro rootwait root=/dev/mmcblk0p2";
+booti $kernel_addr_r - $fdt_addr_r
