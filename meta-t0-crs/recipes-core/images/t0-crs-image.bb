@@ -14,6 +14,7 @@ IMAGE_FEATURES += " \
 IMAGE_INSTALL += " \
         coreutils \
         packagegroup-xilinx-jupyter \
+        pciutils pciutils-ids \
         python3-tuberd \
         python3-numpy \
         python3-matplotlib \
