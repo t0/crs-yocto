@@ -11,7 +11,6 @@ BBLAYERS ?= " \
   ##OEROOT##/../meta-xilinx/meta-xilinx-bsp \
   ##OEROOT##/../meta-xilinx/meta-xilinx-vendor \
   ##OEROOT##/../meta-xilinx/meta-xilinx-virtualization \
-  ##OEROOT##/../meta-xilinx/meta-xilinx-mali400 \
   ##OEROOT##/../meta-xilinx/meta-xilinx-demos \
   ##OEROOT##/../meta-xilinx/meta-xilinx-multimedia \
   ##OEROOT##/../meta-xilinx-tools \
