@@ -1,0 +1,4 @@
+MICROBLAZEPATCHES_GCC14 = ""
+MICROBLAZEPATCHES_GCC14:microblaze = "binutils-microblaze-gcc14.inc"
+
+require ${MICROBLAZEPATCHES_GCC14}
