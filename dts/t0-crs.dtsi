@@ -312,12 +312,15 @@
 
 	pinctrl_sdhci0_default: sdhci0-default {
 		mux {
-			groups = "sdio0_1_grp";
+			/* sdio0_5_grp = 4-bit SDIO, placement 1
+			 * (sdio0_1_grp is 8-bit and claims MIO 45-50
+			 * which are PCIe sideband on this board) */
+			groups = "sdio0_5_grp";
 			function = "sdio0";
 		};
 
 		conf {
-			groups = "sdio0_1_grp";
+			groups = "sdio0_5_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
 			power-source = <IO_STANDARD_LVCMOS33>;
 			bias-disable;
@@ -335,27 +338,29 @@
 			slew-rate = <SLEW_RATE_SLOW>;
 			power-source = <IO_STANDARD_LVCMOS33>;
 		};
-
-		mux-wp {
-			groups = "sdio0_wp_1_grp";
-			function = "sdio0_wp";
-		};
-
-		conf-wp {
-			groups = "sdio0_wp_1_grp";
-			bias-high-impedance;
-			bias-pull-up;
-			slew-rate = <SLEW_RATE_SLOW>;
-			power-source = <IO_STANDARD_LVCMOS33>;
-		};
 	};
 
 	pinctrl_gpio_default: gpio-default {
+	};
+
+	pinctrl_pcie_default: pcie-default {
+		/* Keep PCIe sideband signals (MIO 45-50) as GPIO.
+		 * Without this, the PMUFW sets L1_SEL=1 when the PCIe
+		 * power domain initializes, muxing these pins to an
+		 * undefined function that can deassert CLKREQ#. */
+		mux {
+			groups = "gpio0_45_grp", "gpio0_46_grp",
+				 "gpio0_47_grp", "gpio0_48_grp",
+				 "gpio0_49_grp", "gpio0_50_grp";
+			function = "gpio0";
+		};
 	};
 };
 
 &pcie {
 	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pcie_default>;
 	phys = <&psgtr 0 PHY_TYPE_PCIE 0 0>,
 	       <&psgtr 1 PHY_TYPE_PCIE 1 0>,
 	       <&psgtr 2 PHY_TYPE_PCIE 2 0>,
