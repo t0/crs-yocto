@@ -25,9 +25,9 @@ $(MACHINEFILE): $(SDTFILE)
 	# themselves can be updated from a Vivado-generated .xsa file using
 	# bin/sdtgen. There's an annoying chicken-and-egg: gen-machine-conf
 	# only works if MACHINE can be found, but we're calling this script in
-	# order to generate it. We use zcu208-zynqmp as a placeholder.
+	# order to generate it. We use qemu-zynqmp as a placeholder.
 	source poky/oe-init-build-env && \
-		MACHINE=zcu208-zynqmp \
+		MACHINE=qemu-zynqmp \
 		../meta-xilinx/meta-xilinx-core/gen-machine-conf/gen-machine-conf \
 		parse-sdt --hw-description ../sdt --machine-name=t0-crs
 
