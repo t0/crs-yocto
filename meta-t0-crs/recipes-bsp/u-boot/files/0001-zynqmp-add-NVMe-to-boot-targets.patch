@@ -1,0 +1,38 @@
+From: Graeme Smecher <gsmecher@t0.technology>
+Subject: [PATCH] zynqmp: add NVMe to boot targets
+
+Add NVMe as a boot target for ZynqMP platforms when CONFIG_NVME is
+enabled. The NVMe boot device support already exists in
+config_distro_bootcmd.h but was not wired into the ZynqMP boot target
+list.
+
+Signed-off-by: Graeme Smecher <gsmecher@t0.technology>
+---
+ include/configs/xilinx_zynqmp.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/include/configs/xilinx_zynqmp.h b/include/configs/xilinx_zynqmp.h
+index abcdef0..1234567 100644
+--- a/include/configs/xilinx_zynqmp.h
++++ b/include/configs/xilinx_zynqmp.h
+@@ -101,6 +101,12 @@
+ # define BOOT_TARGET_DEVICES_NAND(func)
+ #endif
+
++#if defined(CONFIG_NVME)
++# define BOOT_TARGET_DEVICES_NVME(func)	func(NVME, nvme, 0)
++#else
++# define BOOT_TARGET_DEVICES_NVME(func)
++#endif
++
+ #define BOOTENV_DEV_QSPI(devtypeu, devtypel, instance) \
+ 	"bootcmd_" #devtypel #instance "=sf probe " #instance " 0 0 && " \
+ 		       "sf read $scriptaddr $script_offset_f $script_size_f && " \
+@@ -166,6 +172,7 @@
+ 	BOOT_TARGET_DEVICES_USB_THOR(func) \
+ 	BOOT_TARGET_DEVICES_USB(func) \
+ 	BOOT_TARGET_DEVICES_SCSI(func) \
++	BOOT_TARGET_DEVICES_NVME(func) \
+ 	BOOT_TARGET_DEVICES_PXE(func) \
+ 	BOOT_TARGET_DEVICES_DHCP(func)
+

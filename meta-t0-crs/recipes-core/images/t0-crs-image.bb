@@ -14,6 +14,8 @@ IMAGE_FEATURES += " \
 IMAGE_INSTALL += " \
         coreutils \
         packagegroup-xilinx-jupyter \
+        devmem2 \
+        nvme-cli \
         pciutils pciutils-ids \
         python3-tuberd \
         python3-numpy \
