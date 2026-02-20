@@ -1,5 +1,21 @@
 dhcp
-fatload mmc 0 $kernel_addr_r Image
-fatload mmc 0 $fdt_addr_r system.dtb
-setenv bootargs "earlycon console=ttyPS0,115200 ip=dhcp ro rootwait root=/dev/mmcblk0p2";
+
+# Load kernel and device tree from whichever device booted this script.
+# bootflow scan sets devtype/devnum (e.g. "mmc 0" or "nvme 0").
+# Fall back to mmc 0 if not set.
+if test -z "$devtype"; then
+    setenv devtype mmc
+    setenv devnum 0
+fi
+
+fatload $devtype $devnum $kernel_addr_r Image
+fatload $devtype $devnum $fdt_addr_r system.dtb
+
+# Pick the right root device
+if test "$devtype" = "nvme"; then
+    setenv bootargs "earlycon console=ttyPS0,115200 ip=dhcp ro rootwait root=/dev/nvme0n1p2"
+else
+    setenv bootargs "earlycon console=ttyPS0,115200 ip=dhcp ro rootwait root=/dev/mmcblk0p2"
+fi
+
 booti $kernel_addr_r - $fdt_addr_r
