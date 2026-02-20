@@ -356,12 +356,15 @@
 
 &pcie {
 	status = "okay";
-	phys = <&psgtr 0 PHY_TYPE_PCIE 0 0>;
+	phys = <&psgtr 0 PHY_TYPE_PCIE 0 0>,
+	       <&psgtr 1 PHY_TYPE_PCIE 1 0>,
+	       <&psgtr 2 PHY_TYPE_PCIE 2 0>,
+	       <&psgtr 3 PHY_TYPE_PCIE 3 0>;
 };
 
 &psgtr {
 	status = "okay";
-	/* pcie, sata, usb3, dp */
+	/* All 4 lanes are PCIe, sharing ref0 */
 	clocks = <&gtr_refclk0>;
 	clock-names = "ref0";
 };
@@ -392,18 +395,7 @@ spi_hmc7044: &spi1 {
 };
 
 &sata {
-	status = "okay";
-	/* SATA OOB timing settings */
-	ceva,p0-cominit-params = /bits/ 8 <0x18 0x40 0x18 0x28>;
-	ceva,p0-comwake-params = /bits/ 8 <0x06 0x14 0x08 0x0E>;
-	ceva,p0-burst-params = /bits/ 8 <0x13 0x08 0x4A 0x06>;
-	ceva,p0-retry-params = /bits/ 16 <0x96A4 0x3FFC>;
-	ceva,p1-cominit-params = /bits/ 8 <0x18 0x40 0x18 0x28>;
-	ceva,p1-comwake-params = /bits/ 8 <0x06 0x14 0x08 0x0E>;
-	ceva,p1-burst-params = /bits/ 8 <0x13 0x08 0x4A 0x06>;
-	ceva,p1-retry-params = /bits/ 16 <0x96A4 0x3FFC>;
-	phy-names = "sata-phy";
-	phys = <&psgtr 3 PHY_TYPE_SATA 1 1>;
+	status = "disabled";
 };
 
 /* SD1 with level shifter */
