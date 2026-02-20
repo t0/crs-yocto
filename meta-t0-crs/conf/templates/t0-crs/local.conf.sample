@@ -314,5 +314,10 @@ SKIP_META_RAUC_FEATURE_CHECK = "1"
 
 # GMS added
 
+# Don't pack the FPGA bitstream into boot.bin - load it at runtime instead.
+# Without this, the 33 MB bitstream inflates boot.bin from ~2.5 MB to ~36 MB.
+MACHINE_FEATURES:append = " fpga-overlay"
+MACHINE_FEATURES:remove:xilinx-standalone = "fpga-overlay"
+
 IMAGE_FSTYPES += "wic"
 WKS_FILES = "xilinx-default-sd.wks"
