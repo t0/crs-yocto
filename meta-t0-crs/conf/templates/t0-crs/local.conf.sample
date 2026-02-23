@@ -47,7 +47,7 @@ DL_DIR ?= "/var/tmp/yocto_downloads"
 #
 # The default is a sstate-cache directory under TOPDIR.
 #
-#SSTATE_DIR ?= "${TOPDIR}/sstate-cache"
+SSTATE_DIR ?= "/var/tmp/yocto_sstate"
 
 #
 # Where to place the build output
