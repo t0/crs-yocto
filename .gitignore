@@ -5,3 +5,4 @@ output/
 sdt/
 *.swp
 .initialized
+.dockerenv-*
