@@ -6,3 +6,5 @@ sdt/
 *.swp
 .initialized
 .dockerenv-*
+vivado*.jou
+vivado*.log
