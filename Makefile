@@ -12,12 +12,25 @@ INITIALIZED = .initialized
 DOCKERSTAMP := .dockerenv-$(shell hostname)
 DOCKERNAME := crs-yocto-docker
 
+# The LD_LIBRARY_PATH modifications done by Vivado's settings64.sh seem to poison
+# Yocto. You should set XILINX_VIVADO but not alter LD_LIBRARY_PATH.
+ifneq ($(shell which vivado 2>/dev/null),)
+ $(error Vivado is in $$PATH — settings64.sh appears to have been sourced. \
+ This will poison Yocto builds via LD_LIBRARY_PATH. \
+ Please start a clean shell and set XILINX_VIVADO instead)
+endif
+XILINX_VIVADO ?= /opt/xilinx/2025.1/Vivado
+export XILINX_VIVADO
+
 # Vivado install path (bind-mounted into container)
 # 2025.1+: /opt/xilinx/2025.1/Vivado
 # older:   /opt/xilinx/Vivado/2023.2
 XILINX_ROOT ?= $(realpath $(XILINX_VIVADO)/../..)
 
 DOCKER_RUN = docker run --rm \
+	--network host \
+	--ipc=host \
+	--pid=host \
 	-u $(shell id -u):$(shell id -g) \
 	-v $(HOME):$(HOME) \
 	-v /var/tmp:/var/tmp \
@@ -38,13 +51,20 @@ $(INITIALIZED): $(DOCKERSTAMP)
 		'cd $(PWD) && TEMPLATECONF="$(PWD)/meta-t0-crs/conf/templates/t0-crs" source poky/oe-init-build-env'
 	touch $(INITIALIZED)
 
-# Step 1: XSA -> sdt (requires Vivado)
+# Step 1: XSA from Vivado project (no synthesis — just block design metadata)
+# The XSA only contains the block design; RTL/constraints don't affect it.
+$(XSA): $(INITIALIZED) crs-mkids/tcl/hw.tcl crs-mkids/tcl/bd.tcl
+	$(DOCKER_RUN) bash -c \
+		'cd $(PWD)/crs-mkids/tcl && source $(XILINX_VIVADO)/settings64.sh && \
+		vivado -mode batch -source xsa.tcl -tclargs -force $(PWD)/$(XSA)'
+
+# Step 2: XSA -> sdt (requires Vivado)
 sdt: $(SDTFILE)
-$(SDTFILE): $(INITIALIZED) $(XSA) $(DTSI) bin/sdtgen
+$(SDTFILE): $(XSA) $(DTSI) bin/sdtgen
 	$(DOCKER_RUN) bash -c \
 		'cd $(PWD) && source $(XILINX_VIVADO)/settings64.sh && bin/sdtgen $(XSA) $(DTSI)'
 
-# Step 2: sdt -> machine configuration
+# Step 3: sdt -> machine configuration
 machine: $(MACHINEFILE)
 $(MACHINEFILE): $(SDTFILE)
 	$(DOCKER_RUN) bash -c \
@@ -53,7 +73,7 @@ $(MACHINEFILE): $(SDTFILE)
 		../meta-xilinx/meta-xilinx-core/gen-machine-conf/gen-machine-conf \
 		parse-sdt --hw-description ../sdt --machine-name=t0-crs'
 
-# Step 3: build image
+# Step 4: build image (bitstream is built here via crs-rfmux recipe)
 rootfs: $(MACHINEFILE)
 	$(DOCKER_RUN) bash -c \
 		'cd $(PWD) && source poky/oe-init-build-env && bitbake t0-crs-image'

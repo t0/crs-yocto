@@ -8,3 +8,4 @@ sdt/
 .dockerenv-*
 vivado*.jou
 vivado*.log
+t0-crs.xsa

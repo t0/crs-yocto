@@ -77,3 +77,6 @@
 	path = meta-qt5
 	url = https://github.com/Xilinx/meta-qt5
 	branch = rel-v2025.2
+[submodule "crs-mkids"]
+	path = crs-mkids
+	url = git@github.com:t0/crs-mkids.git
