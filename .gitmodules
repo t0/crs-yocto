@@ -80,3 +80,7 @@
 [submodule "crs-mkids"]
 	path = crs-mkids
 	url = git@github.com:t0/crs-mkids.git
+[submodule "meta-python-ai"]
+	path = meta-python-ai
+	url = https://github.com/zboszor/meta-python-ai.git
+	branch = scarthgap
