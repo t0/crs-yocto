@@ -84,3 +84,11 @@
 	path = meta-python-ai
 	url = https://github.com/zboszor/meta-python-ai.git
 	branch = scarthgap
+[submodule "meta-clang-revival"]
+	path = meta-clang-revival
+	url = https://github.com/zboszor/meta-clang-revival.git
+	branch = scarthgap
+[submodule "meta-clang"]
+	path = meta-clang
+	url = https://github.com/kraj/meta-clang.git
+	branch = scarthgap
