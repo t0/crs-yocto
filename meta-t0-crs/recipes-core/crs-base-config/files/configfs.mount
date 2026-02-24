@@ -1,0 +1,11 @@
+[Unit]
+Description=configfs
+DefaultDependencies=no
+
+[Mount]
+What=configfs
+Where=/configfs
+Type=configfs
+
+[Install]
+WantedBy=multi-user.target

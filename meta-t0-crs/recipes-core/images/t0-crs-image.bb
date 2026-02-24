@@ -17,10 +17,20 @@ IMAGE_INSTALL += " \
         devmem2 \
         nvme-cli \
         pciutils pciutils-ids \
+        python3-rfmux \
         python3-tuberd \
         python3-numpy \
         python3-matplotlib \
+        python3-aiohttp \
+        python3-scipy \
+        python3-pyyaml \
+        python3-simplejson \
+        python3-sqlalchemy \
+        python3-psutil \
+        python3-requests-futures \
         valgrind \
+        crs-rfmux \
+        crs-base-config \
         "
 
 IMAGE_NAME_SUFFIX ?= ""

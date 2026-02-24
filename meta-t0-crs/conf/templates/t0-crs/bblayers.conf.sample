@@ -38,5 +38,6 @@ BBLAYERS ?= " \
   ##OEROOT##/../meta-jupyter \
   ##OEROOT##/../meta-rauc \
   ##OEROOT##/../meta-system-controller \
+  ##OEROOT##/../meta-python-ai \
   ##OEROOT##/../meta-t0-crs \
 "

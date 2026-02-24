@@ -1,0 +1,13 @@
+[Unit]
+Description=Load CRS rfmux FPGA bitstream and device tree overlay
+Requires=sys-kernel-config.mount
+After=sys-kernel-config.mount
+Before=tuberd.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/crs-rfmux-load
+
+[Install]
+WantedBy=multi-user.target

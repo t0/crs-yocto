@@ -314,6 +314,12 @@ SKIP_META_RAUC_FEATURE_CHECK = "1"
 
 # GMS added
 
+# Set XILINX_VIVADO for recipes that need Vivado (e.g. crs-rfmux-bitstream).
+# Must match the Makefile default. Don't source settings64.sh — it poisons
+# LD_LIBRARY_PATH and breaks pzstd.
+XILINX_VIVADO = "/opt/xilinx/2025.1/Vivado"
+BB_BASEHASH_IGNORE_VARS:append = " XILINX_VIVADO"
+
 # Don't pack the FPGA bitstream into boot.bin - load it at runtime instead.
 # Without this, the 33 MB bitstream inflates boot.bin from ~2.5 MB to ~36 MB.
 MACHINE_FEATURES:append = " fpga-overlay"
@@ -321,3 +327,13 @@ MACHINE_FEATURES:remove:xilinx-standalone = "fpga-overlay"
 
 IMAGE_FSTYPES += "wic"
 WKS_FILES = "xilinx-default-sd.wks"
+
+# Use systemd as init manager
+DISTRO_FEATURES:append = " systemd"
+INIT_MANAGER = "systemd"
+
+# Headless board — remove desktop/GUI features
+DISTRO_FEATURES:remove = "wayland vulkan opengl x11 ptest"
+
+# We want JupyterLab, not the classic notebook
+PREFERRED_RPROVIDER_start-jupyter = "start-jupyterlab"

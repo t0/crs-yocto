@@ -1,0 +1,13 @@
+[Unit]
+Description=Tuberd instrument control daemon
+After=crs-rfmux-load.service network-online.target avahi-daemon.service
+Requires=crs-rfmux-load.service
+Wants=network-online.target avahi-daemon.service
+
+[Service]
+ExecStart=/usr/bin/tuberd -j orjson -w /var/www
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

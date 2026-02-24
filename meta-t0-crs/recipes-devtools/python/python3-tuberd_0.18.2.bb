@@ -27,6 +27,7 @@ RDEPENDS:${PN} += " \
     python3-pybind11 \
     python3-orjson \
     python3-cbor2 \
+    python3-dbus \
     libmicrohttpd \
 "
 
