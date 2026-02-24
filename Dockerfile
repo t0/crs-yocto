@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update -qq \
 	&& apt-get install -y --no-install-recommends \
-		build-essential gcc g++ \
+		build-essential gcc g++ gfortran \
 		gawk wget git git-lfs diffstat unzip texinfo \
 		chrpath socat cpio \
 		python3 python3-pip python3-pexpect python3-git \
