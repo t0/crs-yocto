@@ -294,7 +294,7 @@ LICENSE_FLAGS_ACCEPTED = " \
 # for bitbake to reload cache files and so on. Number is in seconds, after which the
 # server will shut down.
 #
-#BB_SERVER_TIMEOUT = "60"
+BB_SERVER_TIMEOUT = "900"
 
 # CONF_VERSION is increased each time build/conf/ changes incompatibly and is used to
 # track the version of this file when it was generated. This can safely be ignored if
