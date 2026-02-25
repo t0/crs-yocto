@@ -326,7 +326,7 @@ MACHINE_FEATURES:append = " fpga-overlay"
 MACHINE_FEATURES:remove:xilinx-standalone = "fpga-overlay"
 
 IMAGE_FSTYPES += "wic"
-WKS_FILES = "xilinx-default-sd.wks"
+WKS_FILES = "t0-crs-sd.wks"
 
 # Use systemd as init manager
 DISTRO_FEATURES:append = " systemd"
