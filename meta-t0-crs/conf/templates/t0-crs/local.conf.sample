@@ -341,3 +341,7 @@ PREFERRED_RPROVIDER_start-jupyter = "start-jupyterlab"
 # Enable Fortran support (required by openblas/scipy via meta-python-ai)
 FORTRAN:forcevariable = ",fortran"
 HOSTTOOLS += "gfortran"
+
+# OpenBLAS needs LAPACK support for scipy (cspmv_ etc.)
+# See https://github.com/zboszor/meta-python-ai/issues/7
+PACKAGECONFIG:pn-openblas = "lapack cblas"
