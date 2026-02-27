@@ -28,6 +28,7 @@ IMAGE_INSTALL += " \
         python3-sqlalchemy \
         python3-psutil \
         python3-requests-futures \
+        python3-awaitless \
         valgrind \
         crs-rfmux \
         crs-base-config \

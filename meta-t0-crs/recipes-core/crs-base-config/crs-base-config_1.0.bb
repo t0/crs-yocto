@@ -38,9 +38,9 @@ do_install() {
     install -d ${D}${sbindir}
     install -m 0755 ${WORKDIR}/jupyter-home-init.sh ${D}${sbindir}/
 
-    # system-wide environment variables
-    install -d ${D}${sysconfdir}
-    echo 'CRS_EMBEDDED=1' >> ${D}${sysconfdir}/environment
+    # system-wide environment variables (login shells via profile.d)
+    install -d ${D}${sysconfdir}/profile.d
+    echo 'export CRS_EMBEDDED=1' > ${D}${sysconfdir}/profile.d/crs.sh
 
     # configfs mount point
     install -d ${D}/configfs
@@ -48,7 +48,7 @@ do_install() {
 
 FILES:${PN} = " \
     ${sysconfdir}/sysctl.d \
-    ${sysconfdir}/environment \
+    ${sysconfdir}/profile.d/crs.sh \
     ${systemd_system_unitdir} \
     ${sbindir}/jupyter-home-init.sh \
     /configfs \

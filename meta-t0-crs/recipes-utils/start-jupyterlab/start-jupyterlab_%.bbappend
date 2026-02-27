@@ -6,6 +6,7 @@ SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 # Override config and add systemd drop-in to run as jupyter user
 SRC_URI:append = " \
     file://jupyter_server_config.py \
+    file://ipython_config.py \
     file://jupyter-user.conf \
 "
 
@@ -14,6 +15,13 @@ do_install:append() {
     install -d ${D}${systemd_system_unitdir}/jupyter-setup.service.d
     install -m 0644 ${WORKDIR}/jupyter-user.conf \
         ${D}${systemd_system_unitdir}/jupyter-setup.service.d/jupyter-user.conf
+
+    # System-wide IPython config (applies to Jupyter kernels and interactive sessions)
+    install -d ${D}${sysconfdir}/ipython
+    install -m 0644 ${WORKDIR}/ipython_config.py ${D}${sysconfdir}/ipython/
 }
 
-FILES:${PN} += "${systemd_system_unitdir}/jupyter-setup.service.d"
+FILES:${PN} += " \
+    ${systemd_system_unitdir}/jupyter-setup.service.d \
+    ${sysconfdir}/ipython \
+"
