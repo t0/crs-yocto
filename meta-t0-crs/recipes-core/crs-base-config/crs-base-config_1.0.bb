@@ -7,6 +7,9 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 SRC_URI = " \
     file://99-crs-network.conf \
     file://configfs.mount \
+    file://home.mount \
+    file://jupyter-home-init.service \
+    file://jupyter-home-init.sh \
     file://crs-ethtool-rings.service \
 "
 
@@ -14,7 +17,7 @@ S = "${WORKDIR}"
 
 inherit systemd
 
-SYSTEMD_SERVICE:${PN} = "configfs.mount crs-ethtool-rings.service"
+SYSTEMD_SERVICE:${PN} = "configfs.mount home.mount jupyter-home-init.service crs-ethtool-rings.service"
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
 RDEPENDS:${PN} = "ethtool"
@@ -27,7 +30,17 @@ do_install() {
     # systemd units
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/configfs.mount ${D}${systemd_system_unitdir}/
+    install -m 0644 ${WORKDIR}/home.mount ${D}${systemd_system_unitdir}/
+    install -m 0644 ${WORKDIR}/jupyter-home-init.service ${D}${systemd_system_unitdir}/
     install -m 0644 ${WORKDIR}/crs-ethtool-rings.service ${D}${systemd_system_unitdir}/
+
+    # helper scripts
+    install -d ${D}${sbindir}
+    install -m 0755 ${WORKDIR}/jupyter-home-init.sh ${D}${sbindir}/
+
+    # system-wide environment variables
+    install -d ${D}${sysconfdir}
+    echo 'CRS_EMBEDDED=1' >> ${D}${sysconfdir}/environment
 
     # configfs mount point
     install -d ${D}/configfs
@@ -35,7 +48,9 @@ do_install() {
 
 FILES:${PN} = " \
     ${sysconfdir}/sysctl.d \
+    ${sysconfdir}/environment \
     ${systemd_system_unitdir} \
+    ${sbindir}/jupyter-home-init.sh \
     /configfs \
 "
 

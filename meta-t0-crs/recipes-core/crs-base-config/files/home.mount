@@ -1,0 +1,13 @@
+[Unit]
+Description=Mount /home data partition
+DefaultDependencies=no
+Before=local-fs.target
+
+[Mount]
+What=LABEL=home
+Where=/home
+Type=ext4
+Options=defaults,noatime
+
+[Install]
+WantedBy=local-fs.target

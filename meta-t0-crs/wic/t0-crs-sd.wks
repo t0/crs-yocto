@@ -1,5 +1,7 @@
 # Description: Creates a partitioned SD card image. Boot files
 # are located in the first vfat partition. Rootfs will be in second ext4 partition.
+# A third ext4 partition provides writable /home (growpart + resize2fs to fill device).
 
 part  /boot  --source rootfs --change-directory=boot  --fixed-size=128M  --fstype=vfat  --use-label  --label boot  --active  --align 4
 part  /      --source rootfs --exclude-path=boot/                        --fstype=ext4  --use-label  --label root            --align 4
+part  /home  --fixed-size=32M  --fstype=ext4  --use-label  --label home  --align 4

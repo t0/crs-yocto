@@ -33,5 +33,8 @@ IMAGE_INSTALL += " \
         crs-base-config \
         "
 
+IMAGE_CLASSES += "extrausers"
+EXTRA_USERS_PARAMS = "useradd -m -d /home/jupyter -s /bin/sh jupyter;"
+
 IMAGE_NAME_SUFFIX ?= ""
 IMAGE_FSTYPES += "wic"

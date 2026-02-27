@@ -1,0 +1,13 @@
+[Unit]
+Description=Create jupyter home directory on first boot
+After=home.mount
+Requires=home.mount
+Before=jupyter-setup.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/jupyter-home-init.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
