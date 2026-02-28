@@ -20,7 +20,7 @@ inherit systemd
 SYSTEMD_SERVICE:${PN} = "configfs.mount home.mount jupyter-home-init.service crs-ethtool-rings.service"
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
-RDEPENDS:${PN} = "ethtool"
+RDEPENDS:${PN} = "ethtool python3-rfmux"
 
 do_install() {
     # sysctl: 128 MB socket receive buffer for streaming
