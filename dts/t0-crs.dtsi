@@ -376,16 +376,16 @@
 
 &qspi {
 	status = "okay";
-	/*is-dual = <1>;
-	num-cs = <2>;*/
+	is-dual = <1>;
+	num-cs = <2>;
 	flash@0 {
 		/* u-boot has no vendor prefix; Linux uses "st" */
 		compatible = "mt25qu02g", "jedec,spi-nor";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		reg = <0x0>;
-		spi-tx-bus-width = <4>;
-		spi-rx-bus-width = <4>;
+		spi-tx-bus-width = <8>;
+		spi-rx-bus-width = <8>;
 		spi-max-frequency = <10000000>; /* 10 MHz */
 		broken-flash-reset;
 	};
