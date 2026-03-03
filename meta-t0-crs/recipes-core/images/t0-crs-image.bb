@@ -32,6 +32,7 @@ IMAGE_INSTALL += " \
         valgrind \
         crs-rfmux \
         crs-base-config \
+        mtd-utils \
         "
 
 IMAGE_CLASSES += "extrausers"
