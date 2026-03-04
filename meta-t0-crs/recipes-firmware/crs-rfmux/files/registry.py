@@ -10,11 +10,15 @@ f = fru.FRU(open('/sys/bus/i2c/devices/2-0057/eeprom', 'rb').read())
 serial = f.info['Board serial number']
 revision = f.info['Board model']
 
-print(f"Registering hostname rfmux{serial}.local")
+hostname = f'rfmux{serial}'
+print(f"Setting hostname to {hostname}")
+socket.sethostname(hostname)
+
+print(f"Registering hostname {hostname}.local via mDNS")
 try:
     bus = dbus.SystemBus()
     server = dbus.Interface(bus.get_object(avahi.DBUS_NAME, '/'), avahi.DBUS_INTERFACE_SERVER)
-    server.SetHostName(f'rfmux{serial}')
+    server.SetHostName(hostname)
 except dbus.DBusException:
     # Usually an "org.freedesktop.Avahi.NoChangeError" for redundant calls
     pass
