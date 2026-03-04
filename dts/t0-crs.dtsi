@@ -263,12 +263,12 @@
 		};
 
 		mux-cs {
-			groups = "spi1_ss_1_grp";
+			groups = "spi1_ss_3_grp";
 			function = "spi1_ss";
 		};
 
 		conf-cs {
-			groups = "spi1_ss_1_grp";
+			groups = "spi1_ss_3_grp";
 			bias-disable;
 		};
 	};
@@ -376,18 +376,17 @@
 
 &qspi {
 	status = "okay";
-	is-dual = <1>;
 	num-cs = <2>;
 	flash@0 {
 		/* u-boot has no vendor prefix; Linux uses "st" */
 		compatible = "mt25qu02g", "jedec,spi-nor";
 		#address-cells = <1>;
 		#size-cells = <1>;
-		reg = <0x0>;
-		spi-tx-bus-width = <8>;
-		spi-rx-bus-width = <8>;
+		reg = <0x0>, <0x1>;
+		spi-tx-bus-width = <4>;
+		spi-rx-bus-width = <4>;
 		spi-max-frequency = <10000000>; /* 10 MHz */
-		broken-flash-reset;
+		parallel-memories = /bits/ 64 <0x10000000 0x10000000>; /* 2x 256MB */
 	};
 };
 
