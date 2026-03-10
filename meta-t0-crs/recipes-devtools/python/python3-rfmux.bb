@@ -3,9 +3,14 @@ HOMEPAGE = "https://github.com/t0/rfmux"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2491ac3ff16d34a839711d75658cded7"
 
-SRC_URI[sha256sum] = "06d6325f3126b05487401f00af3dc031f29a3865feef5f46c51fe3a5bd663f0a"
+PV = "1.4.2"
+SRCREV = "696e2dbbea1a76812d513e9391a9a923385f1b86"
+SRC_URI = "git://github.com/t0/rfmux.git;protocol=https;branch=fix_wheel_ipynb_distribution"
+S = "${WORKDIR}/git"
 
-inherit cmake pypi setuptools3-base python_pep517
+export SETUPTOOLS_SCM_PRETEND_VERSION = "${PV}"
+
+inherit cmake setuptools3-base python_pep517
 
 # Tell scikit-build-core where to find cmake/ninja so it doesn't try to
 # import the cmake Python module (which lacks the actual binary).
