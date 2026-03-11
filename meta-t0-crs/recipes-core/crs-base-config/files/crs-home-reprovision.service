@@ -1,0 +1,13 @@
+[Unit]
+Description=Provision and mount /home partition
+DefaultDependencies=no
+Before=local-fs.target
+After=local-fs-pre.target systemd-udevd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/crs-home-reprovision.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=local-fs.target

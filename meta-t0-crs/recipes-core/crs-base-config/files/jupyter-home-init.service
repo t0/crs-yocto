@@ -1,7 +1,7 @@
 [Unit]
 Description=Create jupyter home directory on first boot
-After=home.mount
-Requires=home.mount
+After=crs-home-reprovision.service
+Requires=crs-home-reprovision.service
 Before=jupyter-setup.service
 
 [Service]

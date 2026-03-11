@@ -7,20 +7,21 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 SRC_URI = " \
     file://99-crs-network.conf \
     file://configfs.mount \
-    file://home.mount \
     file://jupyter-home-init.service \
     file://jupyter-home-init.sh \
     file://crs-ethtool-rings.service \
+    file://crs-home-reprovision.service \
+    file://crs-home-reprovision.sh \
 "
 
 S = "${WORKDIR}"
 
 inherit systemd
 
-SYSTEMD_SERVICE:${PN} = "configfs.mount home.mount jupyter-home-init.service crs-ethtool-rings.service"
+SYSTEMD_SERVICE:${PN} = "configfs.mount jupyter-home-init.service crs-ethtool-rings.service crs-home-reprovision.service"
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
-RDEPENDS:${PN} = "ethtool python3-rfmux"
+RDEPENDS:${PN} = "ethtool python3-rfmux e2fsprogs util-linux"
 
 do_install() {
     # sysctl: 128 MB socket receive buffer for streaming
@@ -30,13 +31,14 @@ do_install() {
     # systemd units
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/configfs.mount ${D}${systemd_system_unitdir}/
-    install -m 0644 ${WORKDIR}/home.mount ${D}${systemd_system_unitdir}/
     install -m 0644 ${WORKDIR}/jupyter-home-init.service ${D}${systemd_system_unitdir}/
     install -m 0644 ${WORKDIR}/crs-ethtool-rings.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${WORKDIR}/crs-home-reprovision.service ${D}${systemd_system_unitdir}/
 
     # helper scripts
     install -d ${D}${sbindir}
     install -m 0755 ${WORKDIR}/jupyter-home-init.sh ${D}${sbindir}/
+    install -m 0755 ${WORKDIR}/crs-home-reprovision.sh ${D}${sbindir}/
 
     # system-wide environment variables (login shells via profile.d)
     install -d ${D}${sysconfdir}/profile.d
@@ -51,6 +53,7 @@ FILES:${PN} = " \
     ${sysconfdir}/profile.d/crs.sh \
     ${systemd_system_unitdir} \
     ${sbindir}/jupyter-home-init.sh \
+    ${sbindir}/crs-home-reprovision.sh \
     /configfs \
 "
 

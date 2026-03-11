@@ -1,6 +1,8 @@
 [Unit]
 Description=Mount /home data partition
 DefaultDependencies=no
+After=crs-home-reprovision.service
+Requires=crs-home-reprovision.service
 Before=local-fs.target
 
 [Mount]
