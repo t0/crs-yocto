@@ -166,6 +166,63 @@
 				solomon,com-invdir;
 				solomon,com-seq;
 			};*/
+
+			pca9548@71 {
+				compatible = "nxp,pca9548";
+				reg = <0x71>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				i2c-mux-idle-disconnect;
+
+				/* ch0: QSFP module I2C */
+				i2c@0 { reg = <0>; #address-cells = <1>; #size-cells = <0>; };
+				/* ch1..ch6: SFP1..SFP6 module I2C */
+				i2c@1 { reg = <1>; #address-cells = <1>; #size-cells = <0>; };
+				i2c@2 { reg = <2>; #address-cells = <1>; #size-cells = <0>; };
+				i2c@3 { reg = <3>; #address-cells = <1>; #size-cells = <0>; };
+				i2c@4 { reg = <4>; #address-cells = <1>; #size-cells = <0>; };
+				i2c@5 { reg = <5>; #address-cells = <1>; #size-cells = <0>; };
+				i2c@6 { reg = <6>; #address-cells = <1>; #size-cells = <0>; };
+
+				/* ch7: QSFP/SFP control-signal GPIO expanders */
+				i2c@7 {
+					reg = <7>;
+					#address-cells = <1>;
+					#size-cells = <0>;
+
+					pca9575_qsfp: pca9575@20 {
+						compatible = "nxp,pca9575";
+						reg = <0x20>;
+						gpio-controller;
+						#gpio-cells = <2>;
+						gpio-line-names =
+							"QSFP_ModSelL", "QSFP_ModPrsL",
+							"QSFP_ResetL", "QSFP_LPMode",
+							"QSFP_IntL", "TP24",
+							"SFP_RS0", "SFP_RS1",
+							"SFP_TX_FAULT1", "SFP_LOS1",
+							"SFP_MOD_ABS1", "SFP_TX_DIS1",
+							"SFP_TX_FAULT2", "SFP_LOS2",
+							"SFP_MOD_ABS2", "SFP_TX_DIS2";
+					};
+
+					pca9575_sfp: pca9575@21 {
+						compatible = "nxp,pca9575";
+						reg = <0x21>;
+						gpio-controller;
+						#gpio-cells = <2>;
+						gpio-line-names =
+							"SFP_TX_FAULT3", "SFP_LOS3",
+							"SFP_MOD_ABS3", "SFP_TX_DIS3",
+							"SFP_TX_FAULT4", "SFP_LOS4",
+							"SFP_MOD_ABS4", "SFP_TX_DIS4",
+							"SFP_TX_FAULT5", "SFP_LOS5",
+							"SFP_MOD_ABS5", "SFP_TX_DIS5",
+							"SFP_TX_FAULT6", "SFP_LOS6",
+							"SFP_MOD_ABS6", "SFP_TX_DIS6";
+					};
+				};
+			};
 		};
 	};
 };
