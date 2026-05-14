@@ -48,27 +48,27 @@ $(INITIALIZED): $(DOCKERSTAMP)
 	git submodule sync --recursive
 	git submodule update --init --recursive
 	$(DOCKER_RUN) bash -c \
-		'cd $(PWD) && TEMPLATECONF="$(PWD)/meta-t0-crs/conf/templates/t0-crs" source poky/oe-init-build-env'
+		'cd $(CURDIR) && TEMPLATECONF="$(CURDIR)/meta-t0-crs/conf/templates/t0-crs" source poky/oe-init-build-env'
 	touch $(INITIALIZED)
 
 # Step 1: XSA from Vivado project (no synthesis — just block design metadata)
 # The XSA only contains the block design; RTL/constraints don't affect it.
 $(XSA): $(INITIALIZED) crs-mkids/tcl/hw.tcl crs-mkids/tcl/bd.tcl
 	$(DOCKER_RUN) bash -c \
-		'cd $(PWD)/crs-mkids/tcl && source $(XILINX_VIVADO)/settings64.sh && \
-		vivado -mode batch -source xsa.tcl -tclargs -force $(PWD)/$(XSA)'
+		'cd $(CURDIR)/crs-mkids/tcl && source $(XILINX_VIVADO)/settings64.sh && \
+		vivado -mode batch -source xsa.tcl -tclargs -force $(CURDIR)/$(XSA)'
 
 # Step 2: XSA -> sdt (requires Vivado)
 sdt: $(SDTFILE)
 $(SDTFILE): $(XSA) $(DTSI) bin/sdtgen
 	$(DOCKER_RUN) bash -c \
-		'cd $(PWD) && source $(XILINX_VIVADO)/settings64.sh && bin/sdtgen $(XSA) $(DTSI)'
+		'cd $(CURDIR) && source $(XILINX_VIVADO)/settings64.sh && bin/sdtgen $(XSA) $(DTSI)'
 
 # Step 3: sdt -> machine configuration
 machine: $(MACHINEFILE)
 $(MACHINEFILE): $(SDTFILE)
 	$(DOCKER_RUN) bash -c \
-		'cd $(PWD) && source poky/oe-init-build-env && \
+		'cd $(CURDIR) && source poky/oe-init-build-env && \
 		MACHINE=qemu-zynqmp \
 		../meta-xilinx/meta-xilinx-core/gen-machine-conf/gen-machine-conf \
 		parse-sdt --hw-description ../sdt --machine-name=t0-crs'
@@ -76,7 +76,7 @@ $(MACHINEFILE): $(SDTFILE)
 # Step 4: build image (bitstream is built here via crs-rfmux recipe)
 rootfs: $(MACHINEFILE)
 	$(DOCKER_RUN) bash -c \
-		'cd $(PWD) && source poky/oe-init-build-env && bitbake t0-crs-image'
+		'cd $(CURDIR) && source poky/oe-init-build-env && bitbake t0-crs-image'
 
 clean:
 	rm -rf build output sdt
