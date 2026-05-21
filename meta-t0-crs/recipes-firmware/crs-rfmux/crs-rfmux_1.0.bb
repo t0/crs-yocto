@@ -62,7 +62,7 @@ RDEPENDS:${PN} = " \
 SYSTEMD_SERVICE:${PN} = "tuberd.service crs-rfmux-load.service"
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
-RFDC_DRIVER_SRC = "${EMBEDDEDSW_SHARED}/XilinxProcessorIPLib/drivers/rfdc/src"
+export RFDC_DRIVER_SRC = "${EMBEDDEDSW_SHARED}/XilinxProcessorIPLib/drivers/rfdc/src"
 
 do_compile() {
     # Build the kernel module

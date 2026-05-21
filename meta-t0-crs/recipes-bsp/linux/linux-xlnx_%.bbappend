@@ -11,7 +11,7 @@ SRC_URI:remove:t0-crs = " file://0001-PCA9541-Increase-I2C-bus-arbitration-timeo
 # jitter attenuator driver and other ADI IIO/JESD204 infrastructure
 # needed by crs-rfmux.
 KERNELURI:t0-crs = "git://github.com/analogdevicesinc/linux.git;protocol=https;name=machine"
-SRCREV:t0-crs = "8654f35e24e97c40401e5e67a6843e2c9ed6b9fd"
-KBRANCH:t0-crs = "main"
+SRCREV:t0-crs = "40201abd70d8f7848547a09fc7e366fba064483c"
+KBRANCH:t0-crs = "2026_R1"
 LINUX_VERSION:t0-crs = "6.12.0"
 LINUX_VERSION_EXTENSION:t0-crs = "-adi"
