@@ -468,6 +468,15 @@ spi_hmc7044: &spi1 {
 	xlnx,mio-bank = <1>;
 };
 
+&gem0 {
+	/* Because the Vivado design now enables gem0 over EMIO, it shows up in
+	 * the device tree as enabled and u-boot tries to obtain a DHCP lease on
+	 * boot-up - which doesn't work before the fabric is configured. So, we
+	 * re-disable gem0 here and re-enable it in the overlay device tree
+	 * accompanying the bitstream. */
+	status = "disabled";
+};
+
 &uart0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart0_default>;
