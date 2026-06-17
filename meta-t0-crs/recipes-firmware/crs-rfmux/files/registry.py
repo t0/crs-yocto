@@ -5,23 +5,12 @@ sys.path.append('/usr/share/tuberd')
 import dbus
 import avahi
 import fru  # this is a clunky little piece of Lenovo code
-import socket
 f = fru.FRU(open('/sys/bus/i2c/devices/2-0057/eeprom', 'rb').read())
 serial = f.info['Board serial number']
 revision = f.info['Board model']
 
-hostname = f'rfmux{serial}'
-print(f"Setting hostname to {hostname}")
-socket.sethostname(hostname)
-
-print(f"Registering hostname {hostname}.local via mDNS")
-try:
-    bus = dbus.SystemBus()
-    server = dbus.Interface(bus.get_object(avahi.DBUS_NAME, '/'), avahi.DBUS_INTERFACE_SERVER)
-    server.SetHostName(hostname)
-except dbus.DBusException:
-    # Usually an "org.freedesktop.Avahi.NoChangeError" for redundant calls
-    pass
+bus = dbus.SystemBus()
+server = dbus.Interface(bus.get_object(avahi.DBUS_NAME, '/'), avahi.DBUS_INTERFACE_SERVER)
 
 # Register service for generic discovery (not tied to hostname)
 print(f"Registering service _crs-rfmux._tcp.local")

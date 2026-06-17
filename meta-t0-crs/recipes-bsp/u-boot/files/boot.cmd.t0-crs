@@ -11,11 +11,13 @@ fi
 fatload $devtype $devnum $kernel_addr_r Image
 fatload $devtype $devnum $fdt_addr_r system.dtb
 
+setenv hostname "rfmux${board_serial}"
+
 # Pick the right root device
 if test "$devtype" = "nvme"; then
-    setenv bootargs "earlycon console=ttyPS0,115200 ip=dhcp ro rootwait root=/dev/nvme0n1p2"
+    setenv bootargs "earlycon console=ttyPS0,115200 ip=dhcp ro rootwait root=/dev/nvme0n1p2 systemd.hostname=${hostname}"
 else
-    setenv bootargs "earlycon console=ttyPS0,115200 ip=dhcp ro rootwait root=/dev/mmcblk0p2"
+    setenv bootargs "earlycon console=ttyPS0,115200 ip=dhcp ro rootwait root=/dev/mmcblk0p2 systemd.hostname=${hostname}"
 fi
 
 booti $kernel_addr_r - $fdt_addr_r

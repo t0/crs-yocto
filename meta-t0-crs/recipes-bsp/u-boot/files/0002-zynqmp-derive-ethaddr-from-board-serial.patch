@@ -1,0 +1,53 @@
+From: Graeme Smecher <gsmecher@t0.technology>
+Subject: [PATCH] xilinx: derive ethaddr from board_serial if not set
+
+On CRS boards, the FRU EEPROM stores a decimal serial number but no MAC
+address field. Derive a stable locally-administered MAC from board_serial
+at the end of board_late_init_xilinx(), after FRU data has been read.
+
+The MAC is 0c:0e:c1:e0:ss:s0 where "s" is the 3-digit hex representation
+of the serial number. The trailing 0 allows each CRS to host up to 16
+Ethernet interfaces.
+
+Signed-off-by: Graeme Smecher <gsmecher@t0.technology>
+---
+ board/xilinx/common/board.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/board/xilinx/common/board.c b/board/xilinx/common/board.c
+index 01761ea94fd..476c9eed2c8 100644
+--- a/board/xilinx/common/board.c
++++ b/board/xilinx/common/board.c
+@@ -27,6 +27,7 @@
+ #include <i2c_eeprom.h>
+ #include <net.h>
+ #include <generated/dt.h>
++#include <vsprintf.h>
+ #include <rng.h>
+ #include <slre.h>
+ #include <soc.h>
+@@ -523,6 +524,24 @@ int board_late_init_xilinx(void)
+ 	if (ret)
+ 		printf("%s: Saving run time variables FAILED\n", __func__);
+
++	/* Derive a stable MAC from board_serial if no MAC was found in FRU.
++	 * board_serial is a decimal string; MAC is 0c:0e:c1:e0:HH:L0 where
++	 * HH:L are the 3-digit hex representation of the serial number.
++	 */
++	if (CONFIG_IS_ENABLED(NET) || CONFIG_IS_ENABLED(NET_LWIP)) {
++		if (!env_get("ethaddr")) {
++			const char *serial = env_get("board_serial");
++
++			if (serial) {
++				ulong serial_num = dectoul(serial, NULL);
++				u8 mac[6] = { 0x0c, 0x0e, 0xc1, 0xe0,
++					      (serial_num >> 4) & 0xff,
++					      (serial_num & 0x0f) << 4 };
++				eth_env_set_enetaddr("ethaddr", mac);
++			}
++		}
++	}
++
+ 	return 0;
+ }
+ #endif
