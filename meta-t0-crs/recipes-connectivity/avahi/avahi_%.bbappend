@@ -9,6 +9,9 @@ inherit python3-dir
 do_install:append() {
     install -d ${D}${PYTHON_SITEPACKAGES_DIR}/avahi
     install -m 0644 ${S}/avahi-python/avahi/__init__.py ${D}${PYTHON_SITEPACKAGES_DIR}/avahi/
+
+    # Suppress mDNS advertisements on the data-plane interface.
+    echo 'allow-interfaces=eth0' >> ${D}${sysconfdir}/avahi/avahi-daemon.conf
 }
 
 FILES:${PN} += "${PYTHON_SITEPACKAGES_DIR}/avahi"
