@@ -5,7 +5,10 @@ This directory contains post-receive hooks that allow you to set up a
 hair-shirted remote-build framework. Using this, you can trigger builds as
 follows:
 
-	$ git push straylight:crs-yocto-autobuild HEAD:rootfs
+	$ git push straylight:autobuild HEAD:rootfs
+
+Please see https://t0technology.atlassian.net/wiki/spaces/DH/pages/640778241
+for more information.
 
 Setting Up
 ----------
@@ -13,16 +16,18 @@ Setting Up
 1. On the build server, set up a bare repository endpoint that will receive
    your push triggers:
 
-   $ git clone --bare git@github.com:t0/crs-yocto.git crs-yocto-autobuild
+   $ git clone --bare git@github.com:t0/crs-yocto.git autobuild
 
 2. On the build server, install the post-receive hook:
 
-   $ cd crs-yocto-autobuild
+   $ cd autobuild
    $ git show main:hooks/post-receive > hooks/post-receive
    $ chmod 755 hooks/post-receive
 
 3. On your development machine, try it out:
 
-   $ git push straylight:crs-yocto-autobuild HEAD:rootfs
+   $ source setenv.sh
+   $ build-rootfs
 
-   This invokes the "rootfs" target on "straylight".
+   Please see the Confluence page linked at the top of this document for more
+   information.
