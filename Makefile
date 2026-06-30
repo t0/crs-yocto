@@ -27,11 +27,14 @@ export XILINX_VIVADO
 # older:   /opt/xilinx/Vivado/2023.2
 XILINX_ROOT ?= $(realpath $(XILINX_VIVADO)/../..)
 
+# Use a "yocto" group if it exists, or fall back on the user's group
+GID := $(shell getent group yocto 2>/dev/null | cut -d: -f3 || id -g)
+
 DOCKER_RUN = docker run --rm \
 	--network host \
 	--ipc=host \
 	--pid=host \
-	-u $(shell id -u):$(shell id -g) \
+	-u $(shell id -u):$(GID) \
 	-v $(HOME):$(HOME) \
 	-v /var/tmp:/var/tmp \
 	-v $(XILINX_ROOT):$(XILINX_ROOT) \
