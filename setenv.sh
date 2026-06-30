@@ -27,7 +27,7 @@ fetch-collateral() {
         return 1
     fi
     hash="${path%%-rootfs/*}"
-    scp -p "$BUILD_SERVER:$BUILD_BASE/autobuild/$path" "${hash}-t0-crs-image-t0-crs.wic"
+    scp -p "$BUILD_SERVER:$BUILD_BASE/autobuild/$path" "${hash}-$(basename $1)"
 }
 
 fetch-dcp() {
