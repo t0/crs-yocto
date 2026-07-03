@@ -3,9 +3,9 @@ HOMEPAGE = "https://github.com/t0/rfmux"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2491ac3ff16d34a839711d75658cded7"
 
-PV = "1.4.2"
-SRCREV = "696e2dbbea1a76812d513e9391a9a923385f1b86"
-SRC_URI = "git://github.com/t0/rfmux.git;protocol=https;branch=fix_wheel_ipynb_distribution"
+PV = "1.5.0"
+SRCREV = "ed26a0642484709928565f9a1c11fcae2279e90b"
+SRC_URI = "git://github.com/t0/rfmux.git;protocol=https;branch=main"
 S = "${WORKDIR}/git"
 
 export SETUPTOOLS_SCM_PRETEND_VERSION = "${PV}"
