@@ -98,8 +98,9 @@ echo "start=${START}, size=$((DISK_END - START)), type=83" | sfdisk --append --f
 # Notify kernel of the new partition
 partx --add --nr 3 "$DISK"
 
-# Format, mount
-mkfs.ext4 -F -L "$LABEL" "$PART3"
+if [ "$(blkid -o value -s TYPE "$PART3")" != "ext4" ]; then
+	mkfs.ext4 -F -L "$LABEL" "$PART3"
+fi
 do_mount
 
 echo "crs-home-reprovision: $PART3 created and mounted"
