@@ -79,9 +79,7 @@ HOME_SIZE_SECTORS=$((HOME_SIZE_MB * 2048))  # 512-byte sectors
 # Get disk size in sectors
 DISK_SECTORS=$(blockdev --getsz "$DISK")
 
-# Leave the last 33 sectors alone (GPT backup, even though we use MBR —
-# avoids issues if the disk was previously GPT-formatted)
-DISK_END=$((DISK_SECTORS - 33))
+DISK_END=$(DISK_SECTORS)
 
 # Place /home at the end, aligned to 1 MiB
 START=$(( ((DISK_END - HOME_SIZE_SECTORS) / 2048) * 2048 ))
