@@ -21,11 +21,9 @@ if [ -n "$REF_SRC" ] && [ -d "$REF_SRC" ]; then
     for dir in "$REF_SRC"/*/; do
         name=$(basename "$dir")
         dest="$JUPYTER_HOME/$name"
-        if [ ! -e "$dest" ]; then
-            cp -a "$dir" "$dest"
-            chmod -R a-w "$dest"
-            chown -R jupyter:jupyter "$dest"
-        fi
+		cp -a "$dir". "$dest"
+		chmod -R a-w "$dest"
+		chown -R jupyter:jupyter "$dest"
     done
 
     # Copy README.md if not already present
