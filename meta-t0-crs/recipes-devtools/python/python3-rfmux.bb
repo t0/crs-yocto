@@ -3,8 +3,8 @@ HOMEPAGE = "https://github.com/t0/rfmux"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2491ac3ff16d34a839711d75658cded7"
 
-PV = "1.5.0"
-SRCREV = "ed26a0642484709928565f9a1c11fcae2279e90b"
+PV = "1.6.0"
+SRCREV = "c822bdb40b607fe52ce3859b6805ebe0350f4d58"
 SRC_URI = "git://github.com/t0/rfmux.git;protocol=https;branch=main"
 S = "${WORKDIR}/git"
 
