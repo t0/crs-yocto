@@ -9,7 +9,11 @@ BUILD_SERVER=${BUILD_SERVER:-straylight}
 BUILD_BASE=${BUILD_BASE:-autobuild}
 
 build-rootfs() {
-    git push -f $BUILD_SERVER:$BUILD_BASE HEAD:rootfs
+    # Tags ride along because GIT_DESCRIBE (git-describe.bbclass) derives the
+    # firmware version from them; plain `git push` doesn't transfer tags, and
+    # --follow-tags only handles annotated ones. -f keeps re-pointed tags
+    # (e.g. a re-cut rc) in sync too.
+    git push -f $BUILD_SERVER:$BUILD_BASE HEAD:rootfs 'refs/tags/*:refs/tags/*'
 }
 
 fetch-collateral() {
