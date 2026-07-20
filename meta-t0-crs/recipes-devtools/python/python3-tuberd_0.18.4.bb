@@ -1,12 +1,11 @@
 DESCRIPTION = "A C++ server and Python client for exposing an instrumentation control plane across a network."
 HOMEPAGE = "https://github.com/gsmecher/tuberd"
-DEPENDS +="python3-setuptools-scm-native"
 RECIPE_MAINTAINER = "Graeme Smecher <gsmecher@t0.technology>"
 
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=92ff510efeaad7ba38823f5dc8fda92d"
 
-SRC_URI[sha256sum] = "b91fa9021fc1d718761b2e96b3427ac0c592f1796fc9dfd84a0902ac7a13667a"
+SRC_URI[sha256sum] = "ed6a9e6d2858f7b79ed679cfb87d743d3e97044c050e6b140b6d65bdf8130222"
 SRC_URI:append = " \
     file://0001-Workaround-for-pre-PEP-621-setuptools.patch \
     file://FindLibHttpServer.cmake \
@@ -28,6 +27,7 @@ RDEPENDS:${PN} += " \
     python3-orjson \
     python3-cbor2 \
     python3-dbus \
+    python3-requests \
     python3-requests-futures \
     libmicrohttpd \
 "

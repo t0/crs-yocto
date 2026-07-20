@@ -4,8 +4,10 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2491ac3ff16d34a839711d75658cded7"
 
 PV = "1.6.0"
-SRCREV = "c822bdb40b607fe52ce3859b6805ebe0350f4d58"
-SRC_URI = "git://github.com/t0/rfmux.git;protocol=https;branch=main"
+# de-vendored tuber (tuber client now comes from python3-tuberd);
+# revert branch to main once devendor_tuber merges
+SRCREV = "56f97d6c53a1e1374bed2650ad9a61471f422e0e"
+SRC_URI = "git://github.com/t0/rfmux.git;protocol=https;branch=devendor_tuber"
 S = "${WORKDIR}/git"
 
 export SETUPTOOLS_SCM_PRETEND_VERSION = "${PV}"
@@ -42,9 +44,8 @@ RDEPENDS:${PN} += " \
     python3-numpy \
     python3-pyyaml \
     python3-simplejson \
-    python3-requests \
-    python3-requests-futures \
     python3-scipy \
+    python3-tuberd \
 "
 
 INSANE_SKIP:${PN} += "already-stripped"
