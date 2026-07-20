@@ -7,6 +7,7 @@ SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 SRC_URI:append = " \
     file://jupyter_server_config.py \
     file://ipython_config.py \
+    file://crs_preload.py \
     file://jupyter-user.conf \
 "
 
@@ -19,6 +20,7 @@ do_install:append() {
     # System-wide IPython config (applies to Jupyter kernels and interactive sessions)
     install -d ${D}${sysconfdir}/ipython
     install -m 0644 ${WORKDIR}/ipython_config.py ${D}${sysconfdir}/ipython/
+    install -m 0644 ${WORKDIR}/crs_preload.py ${D}${sysconfdir}/ipython/
 }
 
 FILES:${PN} += " \

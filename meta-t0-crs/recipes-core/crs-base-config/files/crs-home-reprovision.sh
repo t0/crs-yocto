@@ -77,9 +77,7 @@ HOME_SIZE_MB=256
 HOME_SIZE_SECTORS=$((HOME_SIZE_MB * 2048))  # 512-byte sectors
 
 # Get disk size in sectors
-DISK_SECTORS=$(blockdev --getsz "$DISK")
-
-DISK_END=$(DISK_SECTORS)
+DISK_END=$(blockdev --getsz "$DISK")
 
 # Place /home at the end, aligned to 1 MiB
 START=$(( ((DISK_END - HOME_SIZE_SECTORS) / 2048) * 2048 ))

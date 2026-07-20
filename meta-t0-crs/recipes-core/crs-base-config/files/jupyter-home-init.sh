@@ -33,3 +33,18 @@ if [ -n "$REF_SRC" ] && [ -d "$REF_SRC" ]; then
         chown jupyter:jupyter "$JUPYTER_HOME/README.md"
     fi
 fi
+
+# Board-owned documentation (firmware release notes, from the crs-release-notes
+# package). Copied after the rfmux notebooks so board-owned content wins any
+# name collision — release notes describe this image, not the rfmux version.
+DOCS_SRC=/usr/share/crs-docs
+
+if [ -d "$DOCS_SRC" ]; then
+    for dir in "$DOCS_SRC"/*/; do
+        name=$(basename "$dir")
+        dest="$JUPYTER_HOME/$name"
+        cp -a "$dir". "$dest"
+        chmod -R a-w "$dest"
+        chown -R jupyter:jupyter "$dest"
+    done
+fi

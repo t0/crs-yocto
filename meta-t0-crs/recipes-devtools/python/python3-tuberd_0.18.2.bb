@@ -28,6 +28,7 @@ RDEPENDS:${PN} += " \
     python3-orjson \
     python3-cbor2 \
     python3-dbus \
+    python3-requests-futures \
     libmicrohttpd \
 "
 

@@ -43,6 +43,7 @@ RDEPENDS:${PN} += " \
     python3-pyyaml \
     python3-simplejson \
     python3-requests \
+    python3-requests-futures \
     python3-scipy \
 "
 
