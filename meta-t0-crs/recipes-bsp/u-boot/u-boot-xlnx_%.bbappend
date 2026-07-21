@@ -2,7 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 UBOOTURI:t0-crs = "git://github.com/t0/u-boot.git;protocol=https"
 UBRANCH:t0-crs = "t0-crs"
-SRCREV:t0-crs = "c150acb2a7a499a7825bdedb4e0db5f41be1a22c"
+SRCREV:t0-crs = "42d6f3c29326b606a44ff2921f99765602b9e84c"
 LIC_FILES_CHKSUM:t0-crs = "file://README;beginline=1;endline=4;md5=c5130931598a8ad21840e124ffe64ea0"
 
 SRC_URI:append:t0-crs = " \
