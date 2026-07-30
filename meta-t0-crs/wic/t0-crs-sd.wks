@@ -2,5 +2,5 @@
 # are located in the first vfat partition. Rootfs will be in second ext4 partition.
 # /home is provisioned on first boot (crs-home-reprovision.service).
 
-part  /boot  --source rootfs --change-directory=boot  --fixed-size=128M  --fstype=vfat  --use-label  --label boot  --active  --align 4
+part  /boot  --source rootfs --change-directory=boot  --fixed-size=128M  --fstype=vfat  --use-label  --label boot  --active  --align 4 --fspassno 2
 part  /      --source rootfs --exclude-path=boot/                        --fstype=ext4  --use-label  --label root            --align 4

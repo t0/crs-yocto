@@ -34,6 +34,8 @@ IMAGE_INSTALL += " \
         crs-base-config \
         crs-release-notes \
         mtd-utils \
+        e2fsprogs-e2fsck \
+        dosfstools \
         "
 
 IMAGE_CLASSES += "extrausers"

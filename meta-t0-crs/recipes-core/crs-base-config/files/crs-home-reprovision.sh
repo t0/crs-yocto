@@ -52,6 +52,16 @@ esac
 PART3="${PARTPREFIX}3"
 
 do_mount() {
+	e2fsck -p "$PART3"
+	rc=$?
+	if [ "$rc" -ge 4 ] then
+		echo "something is wrong with /home, trying to repair..."
+		e2fsck -y "$PART3"
+		rc=$?
+	fi
+	if [ "$rc" -ge 4 ] then
+		exit 1
+	fi
     mount -t ext4 -o defaults,noatime,sync "$PART3" "$MOUNTPOINT"
 }
 
