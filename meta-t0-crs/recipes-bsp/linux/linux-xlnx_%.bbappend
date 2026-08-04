@@ -2,11 +2,6 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI:append:t0-crs = " file://linux-t0-crs.cfg"
 
-# The PCA9541 arbitration timeout patch from meta-system-controller is
-# obsolete: upstream v2025.2 replaced the hardcoded timeouts with the
-# I2C adapter's configurable timeout.
-SRC_URI:remove:t0-crs = " file://0001-PCA9541-Increase-I2C-bus-arbitration-timeout.patch"
-
 # Use the Analog Devices kernel fork, which includes the HMC7044 clock
 # jitter attenuator driver and other ADI IIO/JESD204 infrastructure
 # needed by crs-rfmux.
