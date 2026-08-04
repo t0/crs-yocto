@@ -461,6 +461,13 @@ spi_hmc7044: &spi1 {
 
 /* SD1 with level shifter */
 &sdhci0 {
+	/* The generated pcw.dtsi carries clock-frequency = <199998001>, Vivado's
+	 * "achieved" SD reference rate, which is 1997 Hz below what the clock
+	 * tree can actually produce (799999992/4). Linux won't exceed a
+	 * requested rate, so it rounds the SDIO0_REF divider up from /4 to /5,
+	 * dropping clk_xin from 200 MHz to 160 MHz. Delete the property and
+	 * keep the psu_init-programmed rate. */
+	/delete-property/ clock-frequency;
 	no-1-8-v;
 	disable-wp;
 	pinctrl-names = "default";
