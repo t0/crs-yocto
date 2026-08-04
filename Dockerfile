@@ -18,9 +18,9 @@ RUN apt-get update -qq \
 	&& rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
 # Install libtinfo5, which Vivado still relies on
-RUN wget -q http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb \
-	&& apt-get install -y ./libtinfo5_6.3-2ubuntu0.1_amd64.deb \
-	&& rm libtinfo5_6.3-2ubuntu0.1_amd64.deb
+RUN wget -q http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.2_amd64.deb \
+	&& apt-get install -y ./libtinfo5_6.3-2ubuntu0.2_amd64.deb \
+	&& rm libtinfo5_6.3-2ubuntu0.2_amd64.deb
 
 # Yocto requires en_US.UTF-8
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
