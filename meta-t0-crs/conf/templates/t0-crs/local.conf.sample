@@ -323,6 +323,7 @@ HOSTTOOLS += "gfortran"
 # OpenBLAS needs LAPACK support for scipy (cspmv_ etc.)
 # See https://github.com/zboszor/meta-python-ai/issues/7
 PACKAGECONFIG:pn-openblas = "lapack cblas"
+PACKAGECONFIG:pn-openblas-native = "lapack cblas"
 
 # This is a workaround, likely to prevent CDNs from getting scraped by AI bots.
 # Expect it to break again.
