@@ -6,8 +6,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=2491ac3ff16d34a839711d75658cded7"
 PV = "1.6.0"
 # de-vendored tuber (tuber client now comes from python3-tuberd);
 # revert branch to main once devendor_tuber merges
-SRCREV = "56f97d6c53a1e1374bed2650ad9a61471f422e0e"
-SRC_URI = "git://github.com/t0/rfmux.git;protocol=https;branch=devendor_tuber"
+SRCREV = "385eee96ed35d57a3a716403e2a9b87ffb0e69b4"
+SRC_URI = "git://github.com/t0/rfmux.git;protocol=https;branch=main"
 S = "${WORKDIR}/git"
 
 export SETUPTOOLS_SCM_PRETEND_VERSION = "${PV}"
