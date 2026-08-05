@@ -380,7 +380,7 @@
 			groups = "sdio0_5_grp";
 			slew-rate = <SLEW_RATE_SLOW>;
 			power-source = <IO_STANDARD_LVCMOS33>;
-			bias-disable;
+			bias-pull-up;
 		};
 
 		mux-cd {
