@@ -1,0 +1,64 @@
+From: Luca Jones <ljones@t0.technology>
+Date: Wed, 5 Aug 2026 00:00:00 +0000
+Subject: [PATCH] mmc: core: add SanDisk SN64G to broken SD cache quirks
+
+SanDisk SN64G microSD cards (MID 0x03, OID 0x5344, PNM "SN64G") do not
+implement the SD 6.x cache feature reliably. Intermittently the
+extension register write that sets the Flush Cache bit fails with
+-EILSEQ, and when the write does land the card never clears the bit, so
+mmc_poll_for_busy() times out:
+
+  mmc0: error -84 writing Cache Flush bit
+  mmc0: Card stuck being busy! __mmc_poll_for_busy
+
+Either way the flush request is reported as failed to the block layer,
+which makes ext4 abort its journal and remount read-only:
+
+  I/O error, dev mmcblk0, sector 124454236 op 0x1:(WRITE) flags 0x9800
+  Aborting journal on device mmcblk0p3-8.
+  EXT4-fs error (device mmcblk0p3): ext4_journal_check_start:84: \
+      Detected aborted journal
+  EXT4-fs (mmcblk0p3): Remounting filesystem read-only
+
+Data CRC errors accumulate in mmc err_stats while Command CRC errors and
+Tuning errors stay at zero, and the flash itself passes a full badblocks
+run -- the failure is confined to the cache flush command, not the bus
+and not the media.
+
+This is the same failure mode as the existing Kingston Canvas Go! Plus
+entry, so reuse MMC_QUIRK_BROKEN_SD_CACHE. Observed on cards from
+11/2025, but no date restriction is applied since the defect is tied to
+the card model.
+
+Signed-off-by: Luca Jones <ljones@t0.technology>
+---
+ drivers/mmc/core/quirks.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/drivers/mmc/core/quirks.h b/drivers/mmc/core/quirks.h
+index 92905fc46436..3ea3ee2ba1ba 100644
+--- a/drivers/mmc/core/quirks.h
++++ b/drivers/mmc/core/quirks.h
+@@ -21,6 +21,16 @@ static const struct mmc_fixup __maybe_unused mmc_sd_fixups[] = {
+ 	 * This has so far only been observed on cards from 11/2019, while new
+ 	 * cards from 2023/05 do not exhibit this behavior.
+ 	 */
+ 	_FIXUP_EXT("SD64G", CID_MANFID_KINGSTON_SD, 0x5449, 2019, 11,
+ 		   0, -1ull, SDIO_ANY_ID, SDIO_ANY_ID, add_quirk_sd,
+ 		   MMC_QUIRK_BROKEN_SD_CACHE, EXT_CSD_REV_ANY),
+
++	/*
++	 * SanDisk SN64G microSD cards intermittently fail the extension
++	 * register write that sets the SD cache Flush Cache bit with
++	 * -EILSEQ, and when the write does land the card never clears the
++	 * bit, so mmc_poll_for_busy() times out. Either way the flush
++	 * request fails and ext4 aborts its journal.
++	 */
++	MMC_FIXUP("SN64G", CID_MANFID_SANDISK_SD, 0x5344, add_quirk_sd,
++		  MMC_QUIRK_BROKEN_SD_CACHE),
++
+ 	END_FIXUP
+ };
+
+--
+2.43.0
