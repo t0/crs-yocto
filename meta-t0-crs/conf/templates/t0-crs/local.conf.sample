@@ -329,3 +329,6 @@ PACKAGECONFIG:pn-openblas-native = "lapack cblas"
 # Expect it to break again.
 FETCHCMD_wget = "/usr/bin/env wget -t 2 -T 100 --user-agent='Mozilla/5.0 (X11; Linux x86_64) Gecko/20100101 Firefox/128.0'"
 
+# We use ADI Linux, which has not (yet) moved up to the 6.18.x release used by
+# Xilinx's 2026.1 release.
+PREFERRED_VERSION_linux-xlnx = "6.12.0+git+v2025.2"
