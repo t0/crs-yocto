@@ -10,6 +10,8 @@ SRC_URI:append:t0-crs = " \
     file://t0-crs.env \
     file://0001-zynqmp-add-NVMe-to-boot-targets.patch \
     file://0002-zynqmp-derive-ethaddr-from-board-serial.patch \
+    file://0003-net-lwip-seed-the-PRNG-from-the-MAC-address.patch \
+    file://0004-net-fix-crash-with-CONFIG_DM_RNG-and-no-hardware-sup.patch \
     "
 
 # Install the Yocto-managed board environment into the U-Boot source tree

@@ -1,0 +1,47 @@
+From: Graeme Smecher <gsmecher@t0.technology>
+Subject: [PATCH] net: lwip: seed the PRNG from the MAC address
+
+The lwIP port maps LWIP_RAND() to rand() but never calls srand(), so every
+board produces an identical sequence of "random" numbers. In particular, a
+crate of identical boards powering up in lockstep presents the same DHCP
+transaction ID (XID) to the server, from every board, in every discovery round.
+Packet captures show a switch-hosted DHCP server failing to complete
+REQUEST->ACK for most of a 16-board crate under these conditions, while a lone
+board with a distinct XID obtained its lease immediately.
+
+Call srand_mac() in net_init() before lwip_init(). The MAC-derived seed
+guarantees distinct PRNG sequences across boards even with identical firmware
+and fully synchronous boots.  Seeding before lwip_init() also decorrelates the
+initial TCP/UDP ephemeral port bases, which are drawn during stack init, and
+the DNS query IDs drawn later.
+
+Signed-off-by: Graeme Smecher <gsmecher@t0.technology>
+---
+ net/lwip/net-lwip.c | 4 ++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/net/lwip/net-lwip.c b/net/lwip/net-lwip.c
+index 5fb06fc919d..bf00ecb9787 100644
+--- a/net/lwip/net-lwip.c
++++ b/net/lwip/net-lwip.c
+@@ -19,9 +19,12 @@
+ #include <lwip/prot/etharp.h>
+ #include <lwip/timeouts.h>
+ #include <net.h>
++#include <rand.h>
+ #include <timer.h>
+ #include <u-boot/schedule.h>
+
++#include "../net_rand.h"
++
+ /* xx:xx:xx:xx:xx:xx\0 */
+ #define MAC_ADDR_STRLEN 18
+
+@@ -293,6 +296,7 @@ int net_init(void)
+
+ 	if (!init_done) {
+ 		eth_init_rings();
++		srand_mac();
+ 		lwip_init();
+ 		init_done = true;
+ 	}
