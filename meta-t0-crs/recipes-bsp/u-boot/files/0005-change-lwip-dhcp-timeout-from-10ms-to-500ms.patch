@@ -1,0 +1,25 @@
+From eec19f3b055e5867ff9f0e70cad3ce611baeab8f Mon Sep 17 00:00:00 2001
+From: ljones-source <ljones@t0.technology>
+Date: Thu, 6 Aug 2026 14:44:09 -0700
+Subject: [PATCH] change lwip dhcp timeout from 10ms to 500ms
+
+---
+ net/lwip/dhcp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/lwip/dhcp.c b/net/lwip/dhcp.c
+index b798014ebcb..94a707756a2 100644
+--- a/net/lwip/dhcp.c
++++ b/net/lwip/dhcp.c
+@@ -25,7 +25,7 @@ static char boot_file_name[DHCP_BOOT_FILE_LEN];
+ static void call_lwip_dhcp_fine_tmr(void *ctx)
+ {
+ 	dhcp_fine_tmr();
+-	sys_timeout(10, call_lwip_dhcp_fine_tmr, NULL);
++	sys_timeout(DHCP_FINE_TIMER_MSECS, call_lwip_dhcp_fine_tmr, NULL);
+ }
+ 
+ static int dhcp_loop(struct udevice *udev)
+-- 
+2.47.3
+

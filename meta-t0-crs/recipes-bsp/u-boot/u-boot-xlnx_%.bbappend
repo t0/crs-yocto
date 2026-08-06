@@ -12,6 +12,7 @@ SRC_URI:append:t0-crs = " \
     file://0002-zynqmp-derive-ethaddr-from-board-serial.patch \
     file://0003-net-lwip-seed-the-PRNG-from-the-MAC-address.patch \
     file://0004-net-fix-crash-with-CONFIG_DM_RNG-and-no-hardware-sup.patch \
+    file://0005-change-lwip-dhcp-timeout-from-10ms-to-500ms.patch \
     "
 
 # Install the Yocto-managed board environment into the U-Boot source tree
