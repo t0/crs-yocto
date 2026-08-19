@@ -13,6 +13,8 @@ SRC_URI:append:t0-crs = " \
     file://0003-net-lwip-seed-the-PRNG-from-the-MAC-address.patch \
     file://0004-net-fix-crash-with-CONFIG_DM_RNG-and-no-hardware-sup.patch \
     file://0005-change-lwip-dhcp-timeout-from-10ms-to-500ms.patch \
+    file://0006-net-zynq_gem-plug-resource-leaks-in-.probe-error-and.patch \
+    file://0007-net-eth-phy-release-the-reset-GPIO-on-device-removal.patch \
     "
 
 # Install the Yocto-managed board environment into the U-Boot source tree

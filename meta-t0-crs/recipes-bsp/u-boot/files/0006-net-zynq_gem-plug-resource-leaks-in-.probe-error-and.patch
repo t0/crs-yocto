@@ -1,0 +1,77 @@
+From 66e77f8041711c778f944e318c953ef9a82dac55 Mon Sep 17 00:00:00 2001
+From: Graeme Smecher <gsmecher@t0.technology>
+Date: Wed, 19 Aug 2026 15:55:10 -0700
+Subject: [PATCH 6/7] net: zynq_gem: plug resource leaks in .probe error and
+ .remove paths
+
+zynq_gem_probe() allocates receive buffers, buffer descriptor space and
+(usually) an MDIO bus, but these are leaked on some error paths.
+
+zynq_gem_remove() never freed priv->tx_bd and priv->rxbuffers at all.
+
+Signed-off-by: Graeme Smecher <gsmecher@t0.technology>
+---
+ drivers/net/zynq_gem.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/zynq_gem.c b/drivers/net/zynq_gem.c
+index f570ae9ee73..a41a50e0113 100644
+--- a/drivers/net/zynq_gem.c
++++ b/drivers/net/zynq_gem.c
+@@ -998,13 +998,19 @@ static int zynq_gem_probe(struct udevice *dev)
+ 
+ 	if (!priv->bus) {
+ 		priv->bus = mdio_alloc();
++		if (!priv->bus) {
++			ret = -ENOMEM;
++			goto err2;
++		}
+ 		priv->bus->read = zynq_gem_miiphy_read;
+ 		priv->bus->write = zynq_gem_miiphy_write;
+ 		priv->bus->priv = priv;
+ 
+ 		ret = mdio_register_seq(priv->bus, dev_seq(dev));
+-		if (ret)
++		if (ret) {
++			mdio_free(priv->bus);
+ 			goto err2;
++		}
+ 	}
+ 
+ 	if (IS_ENABLED(CONFIG_DM_ETH_PHY))
+@@ -1024,13 +1030,13 @@ static int zynq_gem_probe(struct udevice *dev)
+ 					dev_err
+ 					(dev,
+ 					 "Failed to set gem dynamic config\n");
+-					return ret;
++					goto err3;
+ 				}
+ 			}
+ 		}
+ 		ret = generic_phy_power_on(&phy);
+ 		if (ret)
+-			return ret;
++			goto err3;
+ 	}
+ 
+ 	printf("\nZYNQ GEM: %lx, mdio bus %lx, phyaddr %d, interface %s\n",
+@@ -1041,6 +1047,7 @@ static int zynq_gem_probe(struct udevice *dev)
+ 
+ err3:
+ 	mdio_unregister(priv->bus);
++	mdio_free(priv->bus);
+ err2:
+ 	free(priv->tx_bd);
+ err1:
+@@ -1055,6 +1062,8 @@ static int zynq_gem_remove(struct udevice *dev)
+ 	free(priv->phydev);
+ 	mdio_unregister(priv->bus);
+ 	mdio_free(priv->bus);
++	free(priv->tx_bd);
++	free(priv->rxbuffers);
+ 
+ 	return 0;
+ }
+-- 
+2.47.3
+

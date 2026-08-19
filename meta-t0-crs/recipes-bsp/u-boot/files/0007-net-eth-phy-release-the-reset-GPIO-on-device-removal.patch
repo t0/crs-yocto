@@ -1,0 +1,48 @@
+From 56189e5ac2664ba7c44bc4210c038a828187e020 Mon Sep 17 00:00:00 2001
+From: Graeme Smecher <gsmecher@t0.technology>
+Date: Wed, 19 Aug 2026 16:08:57 -0700
+Subject: [PATCH 7/7] net: eth-phy: release the reset GPIO on device removal
+
+eth_phy_of_to_plat() claims the PHY reset GPIO with
+gpio_request_by_name(), but nothing releases the claim when the device
+is removed. When retrying a wedged PHY, any follow-up probes fail
+because the GPIO has already been claimed.
+
+Signed-off-by: Graeme Smecher <gsmecher@t0.technology>
+---
+ drivers/net/eth-phy-uclass.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/drivers/net/eth-phy-uclass.c b/drivers/net/eth-phy-uclass.c
+index 1dae26878e6..e93a358a2a6 100644
+--- a/drivers/net/eth-phy-uclass.c
++++ b/drivers/net/eth-phy-uclass.c
+@@ -181,11 +181,25 @@ static int eth_phy_pre_probe(struct udevice *dev)
+ 	return 0;
+ }
+ 
++static int eth_phy_pre_remove(struct udevice *dev)
++{
++	struct eth_phy_device_priv *uc_priv = dev_get_uclass_priv(dev);
++
++	if (!CONFIG_IS_ENABLED(DM_GPIO))
++		return 0;
++
++	if (dm_gpio_is_valid(&uc_priv->reset_gpio))
++		dm_gpio_free(dev, &uc_priv->reset_gpio);
++
++	return 0;
++}
++
+ UCLASS_DRIVER(eth_phy_generic) = {
+ 	.id		= UCLASS_ETH_PHY,
+ 	.name		= "eth_phy_generic",
+ 	.per_device_auto	= sizeof(struct eth_phy_device_priv),
+ 	.pre_probe	= eth_phy_pre_probe,
++	.pre_remove	= eth_phy_pre_remove,
+ };
+ 
+ U_BOOT_DRIVER(eth_phy_generic_drv) = {
+-- 
+2.47.3
+
