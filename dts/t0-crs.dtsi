@@ -24,6 +24,7 @@
 		i2c1 = &i2c1;
 		mmc0 = &sdhci0;
 		nvmem0 = &eeprom; /* this is how u-boot picks up the FRU */
+		backplane0 = &backplane; /* backplane FRU */
 		rtc0 = &rtc;
 		serial0 = &uart0;
 		spi0 = &qspi;
@@ -83,6 +84,11 @@
 	pinctrl-1 = <&pinctrl_i2c0_gpio>;
 	scl-gpios = <&gpio 34 GPIO_ACTIVE_HIGH>;
 	sda-gpios = <&gpio 35 GPIO_ACTIVE_HIGH>;
+
+	backplane: eeprom@51 {
+		compatible = "atmel,24c02";
+		reg = <0x51>;
+	};
 };
 
 &i2c1 {
