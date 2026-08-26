@@ -1,0 +1,45 @@
+From: Luca Jones <ljones@t0.technology>
+Date: Mon, 24 Aug 2026 00:00:00 +0000
+Subject: [PATCH] zynqmp_pmufw: allow reading EFUSE DNA via PM_MMIO_READ
+
+Add the eFUSE device DNA registers to the PMUFW MMIO access whitelist
+so the APU/RPU can read them read-only through the EEMI PM_MMIO_READ
+call, which the ATF forwards to the PMU.
+
+Upstream-Status: Inappropriate [board-specific policy]
+Signed-off-by: Luca Jones <ljones@t0.technology>
+---
+diff --git a/lib/sw_apps/zynqmp_pmufw/src/efuse.h b/lib/sw_apps/zynqmp_pmufw/src/efuse.h
+index 0a5b05770e..965d6af6fb 100644
+--- a/lib/sw_apps/zynqmp_pmufw/src/efuse.h
++++ b/lib/sw_apps/zynqmp_pmufw/src/efuse.h
+@@ -39,6 +39,10 @@ extern "C" {
+ 
+ #define EFUSE_IPDISABLE_VERSION		0x1FFU
+ 
++#define EFUSE_DNA_0        ( ( EFUSE_BASEADDR ) + 0X0000100CU )
++#define EFUSE_DNA_1        ( ( EFUSE_BASEADDR ) + 0X00001010U )
++#define EFUSE_DNA_2        ( ( EFUSE_BASEADDR ) + 0X00001014U )
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/lib/sw_apps/zynqmp_pmufw/src/pm_mmio_access.c b/lib/sw_apps/zynqmp_pmufw/src/pm_mmio_access.c
+index 8ea0afd954..d55cdc6c21 100644
+--- a/lib/sw_apps/zynqmp_pmufw/src/pm_mmio_access.c
++++ b/lib/sw_apps/zynqmp_pmufw/src/pm_mmio_access.c
+@@ -526,6 +526,14 @@ static const PmAccessRegion pmAccessTable[] = {
+ 					 IPI_PMU_0_IER_RPU_1_MASK),
+ 	},
+ 
++	{
++		.startAddr = EFUSE_DNA_0,
++		.endAddr = EFUSE_DNA_2,
++		.access = MMIO_ACCESS_RO(IPI_PMU_0_IER_APU_MASK |
++					 IPI_PMU_0_IER_RPU_0_MASK |
++					 IPI_PMU_0_IER_RPU_1_MASK),
++	},
++
+ #ifdef SECURE_ACCESS
+ 	/*CSU ctrl, sss-cfg, dma-reset registers */
+ 	{
