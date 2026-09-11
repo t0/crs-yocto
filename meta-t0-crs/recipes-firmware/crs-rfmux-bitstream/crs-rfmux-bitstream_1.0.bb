@@ -10,6 +10,7 @@ SRC_URI = " \
     file://tcl/hw.tcl \
     file://tcl/bd.tcl \
     file://tcl/bitstream.tcl \
+    file://tcl/report.tcl \
     file://xdc \
     file://cores \
 "
