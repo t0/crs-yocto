@@ -2,7 +2,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 UBOOTURI:t0-crs = "git://github.com/t0/u-boot.git;protocol=https"
 UBRANCH:t0-crs = "t0-crs"
-SRCREV:t0-crs = "b5f9f232a2bbf2ca60341869c2aa9337d8034dab"
+SRCREV:t0-crs = "bbef788431becce74d3e06274c9fac2f4b7049a9"
 LIC_FILES_CHKSUM:t0-crs = "file://README;beginline=1;endline=4;md5=c5130931598a8ad21840e124ffe64ea0"
 
 SRC_URI:append:t0-crs = " \
@@ -16,6 +16,10 @@ SRC_URI:append:t0-crs = " \
     file://0006-net-zynq_gem-plug-resource-leaks-in-.probe-error-and.patch \
     file://0007-net-eth-phy-release-the-reset-GPIO-on-device-removal.patch \
     "
+
+do_compile:prepend:t0-crs() {
+    export KCPPFLAGS="${KCPPFLAGS} -DT0_BOOTLOADER_VERSION=$(git -C ${S} rev-parse HEAD)"
+}
 
 # Install the Yocto-managed board environment into the U-Boot source tree
 do_configure:prepend:t0-crs() {
