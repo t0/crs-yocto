@@ -44,6 +44,34 @@ do_compile() {
     vivado -mode batch -source hw.tcl -source bitstream.tcl -notrace
 }
 
+# Vivado happily writes a bitstream for a design that fails timing, and
+# wait_on_run doesn't propagate failed runs either, so check the outcome here.
+# This is a separate task so that a failure doesn't throw away the (very
+# expensive) do_compile stamp: the implementation results stay in the workdir
+# for inspection, and re-running only repeats this check.
+#
+# timing.rpt is written by report.tcl as a TCL.POST hook after each
+# implementation step, so the copy left behind reflects the final routed (and
+# post-route phys_opt'd) design. It covers setup, hold, and pulse width.
+do_check_timing() {
+    impl=${S}/tcl/hw/hw.runs/impl_1
+    rpt=$impl/timing.rpt
+
+    if [ ! -f $impl/bd_wrapper.bin ]; then
+        bbfatal "Implementation did not produce a bitstream; see $impl/runme.log"
+    fi
+    if [ ! -f $rpt ]; then
+        bbfatal "No timing report at $rpt"
+    fi
+
+    if ! grep -q "All user specified timing constraints are met." $rpt; then
+        bbfatal "FPGA timing constraints not met:
+$(sed -n '/Design Timing Summary/,+9p' $rpt)
+Full report: $rpt"
+    fi
+}
+addtask check_timing after do_compile before do_install do_deploy
+
 do_install() {
     install -d ${D}${nonarch_base_libdir}/firmware/xilinx/crs-rfmux
     install -m 0644 ${S}/tcl/hw/hw.runs/impl_1/bd_wrapper.bin \
