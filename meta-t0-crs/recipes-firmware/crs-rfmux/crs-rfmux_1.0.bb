@@ -9,7 +9,6 @@ SRC_URI = " \
     file://c/src \
     file://c/include \
     file://c/mak \
-    file://c/dat \
     file://c/arm/mod_rfmux/Makefile \
     file://c/arm/libmkids \
 "
