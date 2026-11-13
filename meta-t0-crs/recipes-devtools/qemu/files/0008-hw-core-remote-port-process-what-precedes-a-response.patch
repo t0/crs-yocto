@@ -1,0 +1,35 @@
+From 174e32525da62dd84976ceaa7a840be604fdff6e Mon Sep 17 00:00:00 2001
+From: Graeme Smecher <gsmecher@t0.technology>
+Date: Tue, 17 Nov 2026 17:51:21 -0700
+Subject: [PATCH] hw/core/remote-port: process what precedes a response before
+ it
+
+A sender waiting for its response resumes as soon as the response
+arrives, though packets the peer sent before it may still be queued.
+On ZynqMP, the PMU lowers mb_sleep on taking an interrupt and then
+responds: the APU's CPU could resume, and read MB_SLEEP, before that
+took effect.
+
+Signed-off-by: Graeme Smecher <gsmecher@t0.technology>
+---
+ hw/core/remote-port.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/hw/core/remote-port.c b/hw/core/remote-port.c
+index abc2771478..0c430c3538 100644
+--- a/hw/core/remote-port.c
++++ b/hw/core/remote-port.c
+@@ -220,6 +220,13 @@ RemotePortRespSlot *rp_dev_timed_wait_resp(RemotePort *s, uint32_t dev,
+             }
+         }
+     }
++    /*
++     * What the peer sent before its response takes effect before the
++     * response does.
++     */
++    rp_rsp_mutex_unlock(s);
++    rp_event_read(s);
++    rp_rsp_mutex_lock(s);
+     return &s->dev_state[dev].rsp_queue[i];
+ }
+ 

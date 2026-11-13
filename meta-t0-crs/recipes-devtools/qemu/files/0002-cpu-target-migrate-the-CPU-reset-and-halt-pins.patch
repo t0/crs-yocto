@@ -1,42 +1,29 @@
-From 93b4b6c97d1550c7350e92f35a90396fdae9f904 Mon Sep 17 00:00:00 2001
+From eb3ccddfd317fcebfc2735cb295b73851a653967 Mon Sep 17 00:00:00 2001
 From: Graeme Smecher <gsmecher@t0.technology>
 Date: Sat, 14 Nov 2026 09:04:50 -0700
-Subject: [PATCH 2/5] cpu-target: migrate the CPU reset and halt pins
+Subject: [PATCH 2/6] cpu-target: migrate the CPU reset and halt pins
 
-cpu_handle_halt() keeps a halted CPU halted while its reset_pin is set,
-but the reset and halt pins (reset_pin, halt_pin, arch_halt_pin) are not
-part of the CPU's migration state. On the destination, the machine reset
-that precedes loading the state can assert them: on ZynqMP, the CRF's
-reset asserts the APU cores' reset lines (crf_apb_reset), which only a
-guest write to RST_FPD_APU lowers again. The restored RST_FPD_APU value
-doesn't drive the lines, so every CPU that was halted (in WFI) when the
-state was saved stays halted forever, while CPUs that were running carry
-on until their first WFI.
+The destination's reset can assert a CPU's reset pin (ZynqMP's CRF does),
+and nothing lowers it once the state is loaded: CPUs that were halted
+when the state was saved never wake.
 
-Migrate the pins in a cpu_common subsection, so that the restored values
-override those the reset left. The subsection is always sent: were it
-sent only when a pin is set, a destination whose reset asserted a pin
-would keep it.
+The subsection is always sent, so for every target, streams no longer
+load on a QEMU without this change.
+
+Signed-off-by: Graeme Smecher <gsmecher@t0.technology>
 ---
- cpu-target.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ cpu-target.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
 diff --git a/cpu-target.c b/cpu-target.c
-index 5a5c5751..3dfc0f28 100644
+index 5a5c57511b..52500f553b 100644
 --- a/cpu-target.c
 +++ b/cpu-target.c
-@@ -112,6 +112,26 @@ static const VMStateDescription vmstate_cpu_common_crash_occurred = {
+@@ -112,6 +112,19 @@ static const VMStateDescription vmstate_cpu_common_crash_occurred = {
      }
  };
  
-+/*
-+ * The reset and halt pins (cpu-exec-gpio.c) gate whether a halted CPU may
-+ * run again (cpu_handle_halt() keeps it halted while reset_pin is set).
-+ * They must be migrated: the destination's machine reset, before the state
-+ * is loaded, asserts them (e.g. ZynqMP's CRF holds the APU cores in reset
-+ * until firmware releases them), and nothing would lower them afterwards,
-+ * so a CPU halted in WFI at the source would never wake.
-+ */
++/* Always sent: the destination's reset may have set a pin */
 +static const VMStateDescription vmstate_cpu_common_pins = {
 +    .name = "cpu_common/pins",
 +    .version_id = 1,
@@ -52,7 +39,7 @@ index 5a5c5751..3dfc0f28 100644
  const VMStateDescription vmstate_cpu_common = {
      .name = "cpu_common",
      .version_id = 1,
-@@ -126,6 +146,7 @@ const VMStateDescription vmstate_cpu_common = {
+@@ -126,6 +139,7 @@ const VMStateDescription vmstate_cpu_common = {
      .subsections = (const VMStateDescription*[]) {
          &vmstate_cpu_common_exception_index,
          &vmstate_cpu_common_crash_occurred,
@@ -60,6 +47,3 @@ index 5a5c5751..3dfc0f28 100644
          NULL
      }
  };
--- 
-2.47.3
-

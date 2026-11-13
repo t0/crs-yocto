@@ -1,0 +1,33 @@
+From 1f7f31626ce41f373dfb3602311c13be9d79504f Mon Sep 17 00:00:00 2001
+From: Graeme Smecher <gsmecher@t0.technology>
+Date: Tue, 17 Nov 2026 17:51:21 -0700
+Subject: [PATCH] target/microblaze: lower mb_sleep when an interrupt wakes the
+ CPU
+
+The mb_sleep output is lowered when a wakeup line rises, but not when
+an interrupt wakes the CPU: it stays high while the CPU runs its
+handler. On ZynqMP, the FSBL waits on it (PMU_GLOBAL's MB_SLEEP) for
+the PMU's ROM to be done with an IPI before it writes the PMU's
+firmware, and so doesn't wait.
+
+Signed-off-by: Graeme Smecher <gsmecher@t0.technology>
+---
+ target/microblaze/cpu.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+index af519e5bd7..ad01c6ec18 100644
+--- a/target/microblaze/cpu.c
++++ b/target/microblaze/cpu.c
+@@ -171,6 +171,8 @@ static void microblaze_cpu_set_irq(void *opaque, int irq, int level)
+     int type = irq ? CPU_INTERRUPT_NMI : CPU_INTERRUPT_HARD;
+ 
+     if (level) {
++        /* The model wakes on an interrupt, as if it were tied to Wakeup */
++        qemu_set_irq(cpu->mb_sleep, false);
+         cpu_interrupt(cs, type);
+     } else {
+         cpu_reset_interrupt(cs, type);
+-- 
+2.47.3
+

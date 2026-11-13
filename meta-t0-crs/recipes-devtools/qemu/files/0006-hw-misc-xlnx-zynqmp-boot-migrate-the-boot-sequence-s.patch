@@ -1,0 +1,52 @@
+From 4b85b48f108dca2650ad72ff612c74b7f848a657 Mon Sep 17 00:00:00 2001
+From: Graeme Smecher <gsmecher@t0.technology>
+Date: Tue, 17 Nov 2026 16:39:25 -0700
+Subject: [PATCH 6/6] hw/misc/xlnx-zynqmp-boot: migrate the boot sequence's
+ state
+
+With use-pmufw, the boot sequence polls for the PMU firmware on a timer.
+The reset that precedes an incoming migration starts it, and with no
+migrated state to replace that, it runs again in the restored guest:
+it rewrites DDR at address 0, sends PM_SET_CONFIGURATION, and sets the
+boot CPU's PC. Restored Linux guests then sometimes hang or panic under
+MTTCG.
+
+The DDR contents saved while the firmware reads its configuration are
+not migrated: a machine saved in that window keeps the configuration
+object at address 0.
+
+Signed-off-by: Graeme Smecher <gsmecher@t0.technology>
+---
+ hw/misc/xlnx-zynqmp-boot.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/hw/misc/xlnx-zynqmp-boot.c b/hw/misc/xlnx-zynqmp-boot.c
+index e1e4c365d9..2f434e1663 100644
+--- a/hw/misc/xlnx-zynqmp-boot.c
++++ b/hw/misc/xlnx-zynqmp-boot.c
+@@ -376,11 +376,25 @@ static Property zynqmp_boot_props[] = {
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
++static const VMStateDescription vmstate_zynqmp_boot = {
++    .name = TYPE_XILINX_ZYNQMP_BOOT,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (const VMStateField[]) {
++        VMSTATE_UINT32(state, ZynqMPBoot),
++        VMSTATE_BOOL(n_reset, ZynqMPBoot),
++        VMSTATE_BOOL(boot_ready, ZynqMPBoot),
++        VMSTATE_PTIMER(ptimer, ZynqMPBoot),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static void zynqmp_boot_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->realize = zynqmp_boot_realize;
++    dc->vmsd = &vmstate_zynqmp_boot;
+     device_class_set_props(dc, zynqmp_boot_props);
+     dc->unrealize = zynqmp_boot_unrealize;
+ }

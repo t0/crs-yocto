@@ -1,35 +1,30 @@
-From 21b46ee5b3254be107859328f32c27b4af38204a Mon Sep 17 00:00:00 2001
+From 837dc9d62e1a26a0b627fd201a2005da9fc35bbb Mon Sep 17 00:00:00 2001
 From: Graeme Smecher <gsmecher@t0.technology>
 Date: Sat, 14 Nov 2026 09:08:17 -0700
-Subject: [PATCH 4/5] hw/xilinx_iomod: migrate the I/O module's state
+Subject: [PATCH 4/6] hw: migrate the I/O module's and the generic timer's
+ state
 
-The MicroBlaze I/O module's models (xlnx.io_intc, xlnx.io_pit,
-xlnx.io_gpi, xlnx.io_gpo, xlnx.io_uart: on ZynqMP, the PMU's) have empty
-vmstates. A restored machine's I/O module comes back as reset: on the
-ZynqMP, the PMU's interrupt controller has every interrupt disabled and
-its PITs are stopped, so the PMU firmware never hears an IPI, and a guest
-that calls it (ATF's ipi_mb_notify, polling for the PMU's acknowledgement
-with interrupts masked) waits forever.
+The MicroBlaze I/O module's models have empty vmstates, so the ZynqMP
+PMU's interrupt controller and PITs come back as reset. Migrate their
+state. Versions go from 1 to 2 with a minimum of 2: older streams carry
+none of it.
 
-Migrate their registers, the interrupt controller's raw input state, the
-PITs' ptimers (for a PIT in use) and prescaler state, and the GPI's
-interrupt enables. Outputs aren't re-driven after loading: their
-receivers migrate their own state (the CPU its interrupt_request, the
-PITs their prescaler enable).
+The memory-mapped ARM generic timer migrates its registers but not
+tick_offset and enabled. Add them as version 2 fields; older streams
+still load.
 
-Each vmstate goes from version 1 to 2, with a minimum of 2: older streams
-carry none of this state, so loading one fails rather than restoring a
-reset I/O module.
+Signed-off-by: Graeme Smecher <gsmecher@t0.technology>
 ---
- hw/char/xilinx_iomod_uart.c |  6 ++++--
- hw/gpio/xilinx_iomod_gpi.c  |  7 +++++--
- hw/gpio/xilinx_iomod_gpo.c  |  5 +++--
- hw/intc/xilinx_iomod_intc.c |  8 ++++++--
- hw/timer/xilinx_iomod_pit.c | 31 +++++++++++++++++++++++++++++--
- 5 files changed, 47 insertions(+), 10 deletions(-)
+ hw/char/xilinx_iomod_uart.c  |  6 ++++--
+ hw/gpio/xilinx_iomod_gpi.c   |  7 +++++--
+ hw/gpio/xilinx_iomod_gpo.c   |  5 +++--
+ hw/intc/xilinx_iomod_intc.c  |  8 ++++++--
+ hw/timer/arm_generic_timer.c |  4 +++-
+ hw/timer/xilinx_iomod_pit.c  | 31 +++++++++++++++++++++++++++++--
+ 6 files changed, 50 insertions(+), 11 deletions(-)
 
 diff --git a/hw/char/xilinx_iomod_uart.c b/hw/char/xilinx_iomod_uart.c
-index c3b2c7d9..205fe746 100644
+index c3b2c7d92d..205fe74617 100644
 --- a/hw/char/xilinx_iomod_uart.c
 +++ b/hw/char/xilinx_iomod_uart.c
 @@ -245,9 +245,11 @@ static void xlx_iom_init(Object *obj)
@@ -47,7 +42,7 @@ index c3b2c7d9..205fe746 100644
      }
  };
 diff --git a/hw/gpio/xilinx_iomod_gpi.c b/hw/gpio/xilinx_iomod_gpi.c
-index 9754cac7..5fba58f1 100644
+index 9754cac7d5..5fba58f10b 100644
 --- a/hw/gpio/xilinx_iomod_gpi.c
 +++ b/hw/gpio/xilinx_iomod_gpi.c
 @@ -222,9 +222,12 @@ static void xlx_iom_init(Object *obj)
@@ -66,7 +61,7 @@ index 9754cac7..5fba58f1 100644
      }
  };
 diff --git a/hw/gpio/xilinx_iomod_gpo.c b/hw/gpio/xilinx_iomod_gpo.c
-index fbd83362..6d7d076c 100644
+index fbd833629c..6d7d076c9a 100644
 --- a/hw/gpio/xilinx_iomod_gpo.c
 +++ b/hw/gpio/xilinx_iomod_gpo.c
 @@ -135,9 +135,10 @@ static void xlx_iom_init(Object *obj)
@@ -83,7 +78,7 @@ index fbd83362..6d7d076c 100644
      }
  };
 diff --git a/hw/intc/xilinx_iomod_intc.c b/hw/intc/xilinx_iomod_intc.c
-index 29be6876..6b36f380 100644
+index 29be6876da..6b36f380e4 100644
 --- a/hw/intc/xilinx_iomod_intc.c
 +++ b/hw/intc/xilinx_iomod_intc.c
 @@ -340,9 +340,13 @@ static int xilinx_iom_fdt_get_irq(FDTGenericIntc *obj, qemu_irq *irqs,
@@ -102,8 +97,26 @@ index 29be6876..6b36f380 100644
          VMSTATE_END_OF_LIST(),
      }
  };
+diff --git a/hw/timer/arm_generic_timer.c b/hw/timer/arm_generic_timer.c
+index a541adbf21..9875f6dbec 100644
+--- a/hw/timer/arm_generic_timer.c
++++ b/hw/timer/arm_generic_timer.c
+@@ -215,10 +215,12 @@ static void arm_gen_timer_init(Object *obj)
+ 
+ static const VMStateDescription vmstate_arm_gen_timer = {
+     .name = TYPE_ARM_GEN_TIMER,
+-    .version_id = 1,
++    .version_id = 2,
+     .minimum_version_id = 1,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT32_ARRAY(regs, ARMGenTimer, R_MAX),
++        VMSTATE_BOOL_V(enabled, ARMGenTimer, 2),
++        VMSTATE_UINT64_V(tick_offset, ARMGenTimer, 2),
+         VMSTATE_END_OF_LIST(),
+     }
+ };
 diff --git a/hw/timer/xilinx_iomod_pit.c b/hw/timer/xilinx_iomod_pit.c
-index 86e844ae..2ce2cc1e 100644
+index 86e844ae8e..2ce2cc1e7f 100644
 --- a/hw/timer/xilinx_iomod_pit.c
 +++ b/hw/timer/xilinx_iomod_pit.c
 @@ -250,12 +250,39 @@ static void xlx_iom_pit_init(Object *obj)
@@ -148,6 +161,3 @@ index 86e844ae..2ce2cc1e 100644
      }
  };
  
--- 
-2.47.3
-
