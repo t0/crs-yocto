@@ -76,10 +76,12 @@ $(MACHINEFILE): $(SDTFILE)
 		../meta-xilinx/meta-xilinx-core/gen-machine-conf/gen-machine-conf \
 		parse-sdt --hw-description ../sdt --machine-name=t0-crs'
 
-# Step 4: build image (bitstream is built here via crs-rfmux recipe)
+# Step 4: build image (bitstream is built here via crs-rfmux recipe), and
+# the QEMU SDK system-level cosimulation runs it with (t0-cosim-qemu-sdk)
 rootfs: $(MACHINEFILE)
 	$(DOCKER_RUN) bash -c \
-		'cd $(CURDIR) && source poky/oe-init-build-env && bitbake t0-crs-image'
+		'cd $(CURDIR) && source poky/oe-init-build-env && \
+		bitbake t0-crs-image t0-cosim-qemu-sdk:do_populate_sdk'
 
 clean:
 	rm -rf build output sdt

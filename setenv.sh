@@ -50,6 +50,23 @@ fetch-fsbl() {
     fetch-collateral 'build/tmp/deploy/images/t0-crs/fsbl-t0-crs.elf' $1
 }
 
+fetch-system-map() {
+    fetch-collateral 'build/tmp/deploy/images/t0-crs/System.map' $1
+}
+
+fetch-cosim-qemu() {
+    fetch-collateral 'build/tmp/deploy/sdk/t0-cosim-qemu-x86_64.sh' $1
+}
+
+# Everything system-level cosimulation (crs-mkids, c/x86_64/cosim) needs from
+# a build, into the current directory: its COSIM_COLLATERAL.
+fetch-cosim() {
+    fetch-wic $1
+    fetch-fsbl $1
+    fetch-system-map $1
+    fetch-cosim-qemu $1
+}
+
 fetch-release() {
     fetch-wic
     fetch-uboot
