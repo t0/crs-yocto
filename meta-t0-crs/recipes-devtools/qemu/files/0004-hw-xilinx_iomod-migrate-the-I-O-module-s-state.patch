@@ -1,0 +1,153 @@
+From 21b46ee5b3254be107859328f32c27b4af38204a Mon Sep 17 00:00:00 2001
+From: Graeme Smecher <gsmecher@t0.technology>
+Date: Sat, 14 Nov 2026 09:08:17 -0700
+Subject: [PATCH 4/5] hw/xilinx_iomod: migrate the I/O module's state
+
+The MicroBlaze I/O module's models (xlnx.io_intc, xlnx.io_pit,
+xlnx.io_gpi, xlnx.io_gpo, xlnx.io_uart: on ZynqMP, the PMU's) have empty
+vmstates. A restored machine's I/O module comes back as reset: on the
+ZynqMP, the PMU's interrupt controller has every interrupt disabled and
+its PITs are stopped, so the PMU firmware never hears an IPI, and a guest
+that calls it (ATF's ipi_mb_notify, polling for the PMU's acknowledgement
+with interrupts masked) waits forever.
+
+Migrate their registers, the interrupt controller's raw input state, the
+PITs' ptimers (for a PIT in use) and prescaler state, and the GPI's
+interrupt enables. Outputs aren't re-driven after loading: their
+receivers migrate their own state (the CPU its interrupt_request, the
+PITs their prescaler enable).
+
+Each vmstate goes from version 1 to 2, with a minimum of 2: older streams
+carry none of this state, so loading one fails rather than restoring a
+reset I/O module.
+---
+ hw/char/xilinx_iomod_uart.c |  6 ++++--
+ hw/gpio/xilinx_iomod_gpi.c  |  7 +++++--
+ hw/gpio/xilinx_iomod_gpo.c  |  5 +++--
+ hw/intc/xilinx_iomod_intc.c |  8 ++++++--
+ hw/timer/xilinx_iomod_pit.c | 31 +++++++++++++++++++++++++++++--
+ 5 files changed, 47 insertions(+), 10 deletions(-)
+
+diff --git a/hw/char/xilinx_iomod_uart.c b/hw/char/xilinx_iomod_uart.c
+index c3b2c7d9..205fe746 100644
+--- a/hw/char/xilinx_iomod_uart.c
++++ b/hw/char/xilinx_iomod_uart.c
+@@ -245,9 +245,11 @@ static void xlx_iom_init(Object *obj)
+ 
+ static const VMStateDescription vmstate_xlx_iom = {
+     .name = TYPE_XILINX_IO_MODULE_UART,
+-    .version_id = 1,
+-    .minimum_version_id = 1,
++    .version_id = 2,
++    .minimum_version_id = 2,
+     .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(regs, XilinxUART, R_MAX_0),
++        VMSTATE_UINT32(baud, XilinxUART),
+         VMSTATE_END_OF_LIST(),
+     }
+ };
+diff --git a/hw/gpio/xilinx_iomod_gpi.c b/hw/gpio/xilinx_iomod_gpi.c
+index 9754cac7..5fba58f1 100644
+--- a/hw/gpio/xilinx_iomod_gpi.c
++++ b/hw/gpio/xilinx_iomod_gpi.c
+@@ -222,9 +222,12 @@ static void xlx_iom_init(Object *obj)
+ 
+ static const VMStateDescription vmstate_xlx_iom = {
+     .name = TYPE_XILINX_IO_MODULE_GPI,
+-    .version_id = 1,
+-    .minimum_version_id = 1,
++    .version_id = 2,
++    .minimum_version_id = 2,
+     .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(regs, XilinxGPI, R_MAX),
++        VMSTATE_UINT32(ien, XilinxGPI),
++        VMSTATE_UINT32(sampled, XilinxGPI),
+         VMSTATE_END_OF_LIST(),
+     }
+ };
+diff --git a/hw/gpio/xilinx_iomod_gpo.c b/hw/gpio/xilinx_iomod_gpo.c
+index fbd83362..6d7d076c 100644
+--- a/hw/gpio/xilinx_iomod_gpo.c
++++ b/hw/gpio/xilinx_iomod_gpo.c
+@@ -135,9 +135,10 @@ static void xlx_iom_init(Object *obj)
+ 
+ static const VMStateDescription vmstate_xlx_iom = {
+     .name = TYPE_XILINX_IO_MODULE_GPO,
+-    .version_id = 1,
+-    .minimum_version_id = 1,
++    .version_id = 2,
++    .minimum_version_id = 2,
+     .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(regs, XilinxGPO, R_MAX),
+         VMSTATE_END_OF_LIST(),
+     }
+ };
+diff --git a/hw/intc/xilinx_iomod_intc.c b/hw/intc/xilinx_iomod_intc.c
+index 29be6876..6b36f380 100644
+--- a/hw/intc/xilinx_iomod_intc.c
++++ b/hw/intc/xilinx_iomod_intc.c
+@@ -340,9 +340,13 @@ static int xilinx_iom_fdt_get_irq(FDTGenericIntc *obj, qemu_irq *irqs,
+ 
+ static const VMStateDescription vmstate_xlx_iom = {
+     .name = TYPE_XILINX_IO_MODULE_INTC,
+-    .version_id = 1,
+-    .minimum_version_id = 1,
++    .version_id = 2,
++    .minimum_version_id = 2,
+     .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(regs0, XilinxIntC, R_MAX_0),
++        VMSTATE_UINT32_ARRAY(regs1, XilinxIntC, R_MAX_1),
++        VMSTATE_UINT32_ARRAY(regs2, XilinxIntC, R_MAX_2),
++        VMSTATE_UINT32(irq_raw, XilinxIntC),
+         VMSTATE_END_OF_LIST(),
+     }
+ };
+diff --git a/hw/timer/xilinx_iomod_pit.c b/hw/timer/xilinx_iomod_pit.c
+index 86e844ae..2ce2cc1e 100644
+--- a/hw/timer/xilinx_iomod_pit.c
++++ b/hw/timer/xilinx_iomod_pit.c
+@@ -250,12 +250,39 @@ static void xlx_iom_pit_init(Object *obj)
+     sysbus_init_irq(sbd, &s->irq);
+ }
+ 
+-static const VMStateDescription vmstate_xlx_iom = {
+-    .name = TYPE_XILINX_IO_MODULE_PIT,
++static bool xlx_iom_ptimer_needed(void *opaque)
++{
++    XilinxPIT *s = opaque;
++
++    /* (only a PIT in use has one) */
++    return s->ptimer != NULL;
++}
++
++static const VMStateDescription vmstate_xlx_iom_ptimer = {
++    .name = TYPE_XILINX_IO_MODULE_PIT "/ptimer",
+     .version_id = 1,
+     .minimum_version_id = 1,
++    .needed = xlx_iom_ptimer_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_PTIMER(ptimer, XilinxPIT),
++        VMSTATE_END_OF_LIST(),
++    }
++};
++
++static const VMStateDescription vmstate_xlx_iom = {
++    .name = TYPE_XILINX_IO_MODULE_PIT,
++    .version_id = 2,
++    .minimum_version_id = 2,
+     .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(regs, XilinxPIT, R_MAX),
++        VMSTATE_UINT32(ps_counter, XilinxPIT),
++        VMSTATE_BOOL(ps_enable, XilinxPIT),
++        VMSTATE_BOOL(ps_level, XilinxPIT),
+         VMSTATE_END_OF_LIST(),
++    },
++    .subsections = (const VMStateDescription * []) {
++        &vmstate_xlx_iom_ptimer,
++        NULL
+     }
+ };
+ 
+-- 
+2.47.3
+

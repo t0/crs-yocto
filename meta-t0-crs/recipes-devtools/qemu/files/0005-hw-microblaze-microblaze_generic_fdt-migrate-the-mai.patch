@@ -1,0 +1,45 @@
+From 69ac10599a3931449661002ea7334da164f67b15 Mon Sep 17 00:00:00 2001
+From: Graeme Smecher <gsmecher@t0.technology>
+Date: Sat, 14 Nov 2026 09:08:17 -0700
+Subject: [PATCH 5/5] hw/microblaze/microblaze_generic_fdt: migrate the main
+ memory
+
+The microblaze-fdt machine's main memory, created from the device tree
+(fdt_generic's memory region, whose "ram" property allocates its block
+with qemu_ram_alloc), isn't registered for migration, so it's never in
+the stream. An incoming migration skips loading ROM images (rom_reset()
+leaves them to the stream), so a restored machine's main memory comes
+back empty: the ZynqMP PMU's ROM, at the reset and exception vectors, is
+all zeros, and the restored PMU loops on illegal-opcode exceptions at
+its vector.
+
+Register it, unless it's already migratable. Its RAM block is named
+after its node (memory@ffd00000 for the ZynqMP PMU's ROM).
+---
+ hw/microblaze/microblaze_generic_fdt.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/hw/microblaze/microblaze_generic_fdt.c b/hw/microblaze/microblaze_generic_fdt.c
+index cc6e5794..ad14c21b 100644
+--- a/hw/microblaze/microblaze_generic_fdt.c
++++ b/hw/microblaze/microblaze_generic_fdt.c
+@@ -191,6 +191,16 @@ microblaze_generic_fdt_init(MachineState *machine)
+     fdti = fdt_generic_create_machine(fdt, NULL);
+     main_mem = MEMORY_REGION(object_resolve_path(node_path, NULL));
+ 
++    /*
++     * Migrate the main memory: nothing else would. (An incoming migration
++     * skips loading ROM images into it, expecting its contents in the
++     * stream: the ZynqMP PMU's ROM, say, would come back empty.)
++     */
++    if (memory_region_is_ram(main_mem) &&
++        !qemu_ram_is_migratable(main_mem->ram_block)) {
++        vmstate_register_ram_global(main_mem);
++    }
++
+     ram_kernel_base = object_property_get_int(OBJECT(main_mem), "addr", NULL);
+     ram_kernel_size = object_property_get_int(OBJECT(main_mem), "size", NULL);
+ 
+-- 
+2.47.3
+

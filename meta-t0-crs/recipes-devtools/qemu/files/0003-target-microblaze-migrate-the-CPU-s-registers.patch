@@ -1,0 +1,38 @@
+From 25e409b82d53f57a1c5caf3d7b104c9549156507 Mon Sep 17 00:00:00 2001
+From: Graeme Smecher <gsmecher@t0.technology>
+Date: Sat, 14 Nov 2026 09:04:50 -0700
+Subject: [PATCH 3/5] target/microblaze: migrate the CPU's registers
+
+vmstate_mb_cpu is version 0, but its env field (all of the CPU's
+registers: r0-r31, pc, msr, esr, ...) is tagged version 1. Fields newer
+than their description are skipped, so the registers were never saved or
+loaded: a restored MicroBlaze came back with its power-on registers (pc
+at the reset vector) and only cpu_common's halted and interrupt_request.
+
+Make the description version 1, matching the field. Streams from before
+this change carry no registers, so they can't be restored anyway: the
+minimum version is 1 too, so that loading one fails rather than restoring
+a CPU without its state.
+
+Fixes: 77f63e1dadb3 ("target/microblaze: Fill in VMStateDescription for cpu")
+---
+ target/microblaze/machine.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/target/microblaze/machine.c b/target/microblaze/machine.c
+index d24def39..4e5ac1ec 100644
+--- a/target/microblaze/machine.c
++++ b/target/microblaze/machine.c
+@@ -100,7 +100,7 @@ static VMStateField vmstate_cpu_fields[] = {
+ 
+ const VMStateDescription vmstate_mb_cpu = {
+     .name = "cpu",
+-    .version_id = 0,
+-    .minimum_version_id = 0,
++    .version_id = 1,
++    .minimum_version_id = 1,
+     .fields = vmstate_cpu_fields,
+ };
+-- 
+2.47.3
+
