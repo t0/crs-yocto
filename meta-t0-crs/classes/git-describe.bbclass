@@ -10,7 +10,17 @@
 def t0_git_describe(d):
     import oe.buildcfg
     path = os.path.dirname(d.getVar('COREBASE'))
-    describe = oe.buildcfg.get_metadata_git_describe(path) or "unknown"
+    # Not oe.buildcfg.get_metadata_git_describe(), which runs git under
+    # pseudo when a fakeroot task (do_package_qa, do_install, ...) reparses
+    # the recipe. There git believes it is root, refuses the user's
+    # repository ("detected dubious ownership"), and the helper's empty
+    # result changes this value mid-build ("the basehash value changed").
+    # is_layer_modified() already unloads pseudo the same way.
+    try:
+        describe, _ = bb.process.run('PSEUDO_UNLOAD=1 git describe --tags', cwd=path)
+    except bb.process.ExecutionError as e:
+        bb.fatal("git describe failed in %s: %s" % (path, e))
+    describe = describe.strip()
     # Tracked changes only (including submodule drift); untracked files in
     # the working tree are not detected.
     if oe.buildcfg.is_layer_modified(path):
