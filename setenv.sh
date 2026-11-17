@@ -54,8 +54,8 @@ fetch-system-map() {
     fetch-collateral 'build/tmp/deploy/images/t0-crs/System.map' $1
 }
 
-fetch-cosim-qemu() {
-    fetch-collateral 'build/tmp/deploy/sdk/t0-cosim-qemu-x86_64.sh' $1
+fetch-cosim-sdk() {
+    fetch-collateral 'build/tmp/deploy/sdk/t0-cosim-sdk-x86_64.sh' $1
 }
 
 # Everything system-level cosimulation (crs-mkids, c/x86_64/cosim) needs from
@@ -64,7 +64,7 @@ fetch-cosim() {
     fetch-wic $1
     fetch-fsbl $1
     fetch-system-map $1
-    fetch-cosim-qemu $1
+    fetch-cosim-sdk $1
 }
 
 fetch-release() {

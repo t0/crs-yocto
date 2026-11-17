@@ -14,25 +14,22 @@ SRC_URI = " \
     file://c/arm/libmkids \
 "
 
-# RFDC driver source from the shared Xilinx embeddedsw checkout (same version
-# used by SDT/lopper to generate param-list, so the XRFdc_Config struct layout
-# is guaranteed to match).
-ESW_VER = "2025.2"
-EMBEDDEDSW_SHARED = "${TMPDIR}/work-shared/embeddedsw-${ESW_VER}/git"
-do_compile[depends] += "embeddedsw-source-${ESW_VER}:do_configure"
+# The RFDC driver's source, from the Vivado install that made the SDT
+require rfdc-driver.inc
+do_compile[file-checksums] += "${RFDC_SDT_PL}:True"
 
 # The default DEBUG_PREFIX_MAP only remaps ${WORKDIR} and the sysroots.  We
-# also compile sources out of work-shared trees (embeddedsw for the RFDC
-# driver, the kernel for mod_rfmux), whose absolute paths would otherwise
-# land in debug info and trip the buildpaths QA check.
+# also compile sources out of the Vivado install (the RFDC driver) and a
+# work-shared tree (the kernel, for mod_rfmux), whose absolute paths would
+# otherwise land in debug info and trip the buildpaths QA check.
 #
 # Destinations must live under /usr/src/debug: do_package's copydebugsources
 # (oe/package.py) copies the sources referenced by each -fdebug-prefix-map
 # into the package tree at the mapped path, and only /usr/src/debug is
 # shipped (by ${PN}-dbg) -- anything else fails installed-vs-shipped.
 DEBUG_PREFIX_MAP:append = " \
-    -fdebug-prefix-map=${EMBEDDEDSW_SHARED}=/usr/src/debug/embeddedsw-${ESW_VER} \
-    -fmacro-prefix-map=${EMBEDDEDSW_SHARED}=/usr/src/debug/embeddedsw-${ESW_VER} \
+    -fdebug-prefix-map=${RFDC_DRIVER_SRC}=/usr/src/debug/rfdc \
+    -fmacro-prefix-map=${RFDC_DRIVER_SRC}=/usr/src/debug/rfdc \
     -fdebug-prefix-map=${STAGING_KERNEL_DIR}=/usr/src/debug/kernel-source \
     -fdebug-prefix-map=${STAGING_KERNEL_BUILDDIR}=/usr/src/debug/kernel-build \
 "
@@ -78,9 +75,11 @@ RDEPENDS:${PN} = " \
 SYSTEMD_SERVICE:${PN} = "tuberd.service crs-rfmux-load.service"
 SYSTEMD_AUTO_ENABLE:${PN} = "enable"
 
-export RFDC_DRIVER_SRC = "${EMBEDDEDSW_SHARED}/XilinxProcessorIPLib/drivers/rfdc/src"
+export RFDC_DRIVER_SRC
 
 do_compile() {
+    rfdc_param_list_check ${CC} -D_GNU_SOURCE -DMETAL_INTERNAL
+
     # Build the kernel module
     oe_runmake -C ${STAGING_KERNEL_BUILDDIR} \
         M=${S}/c/arm/mod_rfmux \

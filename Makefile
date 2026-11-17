@@ -77,11 +77,12 @@ $(MACHINEFILE): $(SDTFILE)
 		parse-sdt --hw-description ../sdt --machine-name=t0-crs'
 
 # Step 4: build image (bitstream is built here via crs-rfmux recipe), and
-# the QEMU SDK system-level cosimulation runs it with (t0-cosim-qemu-sdk)
+# the SDK system-level cosimulation runs it with (t0-cosim-sdk: QEMU, and a
+# toolchain to build the crs-mkids tree under test)
 rootfs: $(MACHINEFILE)
 	$(DOCKER_RUN) bash -c \
 		'cd $(CURDIR) && source poky/oe-init-build-env && \
-		bitbake t0-crs-image t0-cosim-qemu-sdk:do_populate_sdk'
+		bitbake t0-crs-image t0-cosim-sdk:do_populate_sdk'
 
 clean:
 	rm -rf build output sdt
