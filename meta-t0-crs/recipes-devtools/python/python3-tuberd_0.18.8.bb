@@ -5,22 +5,23 @@ RECIPE_MAINTAINER = "Graeme Smecher <gsmecher@t0.technology>"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=92ff510efeaad7ba38823f5dc8fda92d"
 
-SRC_URI[sha256sum] = "ed6a9e6d2858f7b79ed679cfb87d743d3e97044c050e6b140b6d65bdf8130222"
+SRC_URI[sha256sum] = "74cc6b165299a3372619b6a52af3afb99c2c2215fac91f50fd421f425a906e30"
 SRC_URI:append = " \
     file://0001-Workaround-for-pre-PEP-621-setuptools.patch \
-    file://FindLibHttpServer.cmake \
 "
 
 inherit cmake pypi python_setuptools_build_meta
 
 DEPENDS += " \
     python3-pybind11-native \
-    libhttpserver \
     python3-setuptools-scm-native \
 "
 
-# Ensure we can find FindLibHttpServer.cmake
-export CMAKE_ARGS += "${OECMAKE_ARGS} -DCMAKE_MODULE_PATH=${WORKDIR}"
+export CMAKE_ARGS += "${OECMAKE_ARGS}"
+
+# pyproject.toml asks for pybind11 2.13 (for free-threaded Python); the tree's
+# is 2.12 (meta-python-ai), which the source still supports
+PEP517_BUILD_OPTS = "--skip-dependency-check"
 
 RDEPENDS:${PN} += " \
     python3-pybind11 \
@@ -29,7 +30,6 @@ RDEPENDS:${PN} += " \
     python3-dbus \
     python3-requests \
     python3-requests-futures \
-    libmicrohttpd \
 "
 
 INSANE_SKIP:${PN}:append = "already-stripped"
