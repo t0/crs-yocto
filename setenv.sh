@@ -59,11 +59,10 @@ fetch-cosim-sdk() {
 }
 
 # Everything system-level cosimulation (crs-mkids, c/x86_64/cosim) needs from
-# a build, into the current directory: its COSIM_COLLATERAL.
+# a build, into the current directory: its COSIM_COLLATERAL. (The image
+# carries the FSBL, in BOOT.bin, and the SDK the kernel's System.map.)
 fetch-cosim() {
     fetch-wic $1
-    fetch-fsbl $1
-    fetch-system-map $1
     fetch-cosim-sdk $1
 }
 
