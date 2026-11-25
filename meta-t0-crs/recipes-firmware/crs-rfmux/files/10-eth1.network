@@ -1,0 +1,18 @@
+# eth1 (GEM0) reaches the 100 GbE network through the PL's GMII bridge, and
+# takes its address there by DHCP, as every link did from the kernel's ip=dhcp
+# (systemd-network-generator's 71-default.network) before this file. The 100
+# GbE network is optional: its link is fixed (fixed-link: always up), so with
+# no DHCP server eth1 would stay "configuring", and systemd-networkd-wait-online
+# would hold up network-online.target (and tuberd) for its whole timeout,
+# whenever eth1 appeared before it gave up. eth0 alone decides online.
+#
+# Streaming over the 100 GbE network needs eth1's address (crs_stream.cpp).
+
+[Match]
+Name=eth1
+
+[Link]
+RequiredForOnline=no
+
+[Network]
+DHCP=ipv4
