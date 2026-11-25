@@ -44,6 +44,7 @@ SRC_URI += " \
     file://fru.py \
     file://index.html \
     file://80-net-setup-link.link \
+    file://10-eth1.network \
 "
 
 S = "${WORKDIR}"
@@ -151,6 +152,7 @@ do_install() {
     # Force kernel network interface names (eth0 instead of end0)
     install -d ${D}${sysconfdir}/systemd/network
     install -m 0644 ${WORKDIR}/80-net-setup-link.link ${D}${sysconfdir}/systemd/network/
+    install -m 0644 ${WORKDIR}/10-eth1.network ${D}${sysconfdir}/systemd/network/
 }
 
 # Module is loaded explicitly by crs-rfmux-load.sh after the FPGA bitstream
